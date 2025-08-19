@@ -3,18 +3,14 @@ const bcrypt = require("bcryptjs");
 
 // Israeli ID validation function
 const validateIsraeliID = (id) => {
-  // Remove any non-digit characters
-  const cleanId = id.replace(/\D/g, "");
-
-  // Israeli ID must be 9 digits
-  if (cleanId.length !== 9) {
-    return false;
-  }
+  // Validate a 9 digit number
+  const match = id.match(/\D/);
+  if (match !== null || id.length !== 9) return false;
 
   // Calculate checksum using the Israeli ID algorithm
   let sum = 0;
   for (let i = 0; i < 8; i++) {
-    let digit = parseInt(cleanId[i]);
+    let digit = parseInt(id[i]);
     if (i % 2 === 1) {
       digit *= 2;
       if (digit > 9) {
@@ -25,9 +21,23 @@ const validateIsraeliID = (id) => {
   }
 
   const checkDigit = (10 - (sum % 10)) % 10;
-  return checkDigit === parseInt(cleanId[8]);
+  return checkDigit === parseInt(id[8]);
 };
-
+function validateFullName(name) {
+  // Validate the name's length
+  return name.length >= 2 && name.length <= 100;
+}
+function validateEmail(email) {
+  // Validate lowercase and correct format
+  return (
+    email.match(/[A-Z]/) === null &&
+    email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/) === null
+  );
+}
+function validatePassword(password) {
+  // Validate password is at least 8 letters with only letters digits and few special letters
+  return password.match(/^[\w\d!?#$%&*+,\-./@^|~]{8,}$/) !== null;
+}
 const userSchema = new mongoose.Schema(
   {
     fullName: {
@@ -73,6 +83,29 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Validate all fields
+function validateFields(user) {
+  user.email.trim();
+  user.fullName.trim();
+  if (!validateEmail(user.email)) throw new Error("Please enter a valid email!");
+
+  if (!validateFullName(user.fullName)) throw new Error("Full name is between 2 and 100 letters");
+
+  if (!validatePassword(user.password)) throw new Error("Please enter a valid password");
+
+  if (!validateIsraeliID(user.israeliId)) throw new Error("Please enter a valid id");
+  try {
+  const salt = await bcrypt.genSalt(12);
+  user.password = await bcrypt.hash(user.password, salt);
+  return true;
+} catch (error) {
+  console.log(error);
+  return false;
+}
+
+}
+
+
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
@@ -88,16 +121,11 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
 // Remove password from JSON output
-userSchema.methods.toJSON = function () {
+function toJSON() {
   const userObject = this.toObject();
   delete userObject.password;
   return userObject;
-};
+}
 
 module.exports = mongoose.model("User", userSchema);
