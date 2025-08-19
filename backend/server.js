@@ -3,7 +3,6 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
-const connectDB = require("./config/database");
 const authRoutes = require("./routes/auth");
 
 // Load environment variables
@@ -11,9 +10,6 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Connect to MongoDB
-connectDB();
 
 // Security middleware
 app.use(
