@@ -1,0 +1,36 @@
+import React from "react";
+import { useAuth } from "../context/AuthContext";
+import Header from "../components/Header";
+
+function AlertsPage() {
+  const { user, logout } = useAuth();
+  const data = [
+    { priority: 1, name: "a", location: "a" },
+    { priority: 2, name: "b", location: "b" },
+    { priority: 3, name: "c", location: "c" },
+    { priority: 3, name: "d", location: "d" },
+  ];
+  if (!user) {
+    return (
+      <div className="container">
+        <div className="loading">Loading alerts</div>
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div className="main-container">
+        <Header logout={logout} />
+        loading...
+      </div>
+    );
+  }
+  return (
+    <div className="main-container">
+      <Header logout={logout} />
+      
+    </div>
+  );
+}
+
+export default AlertsPage;
