@@ -10,7 +10,7 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
   try {
     const { fullName, email, id, role, password } = req.body;
     // Check if user already exists
-    const existingUser = await prisma.findUnique({ where: { OR: [{ email }, { id }] } });
+    const existingUser = await prisma.user.findFirst({ where: { OR: [{ email }, { id }] } });
 
     if (existingUser) {
       const field = existingUser.email === email ? "email" : "ID";
@@ -33,7 +33,7 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
     // Generate token
     const token = generateToken(user.id);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "User created successfully",
       token,
       user: {
@@ -44,14 +44,16 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.error("Signup error:", error.message);
 
     // CHECK!!!
     if (error.name === "ValidationError") {
-      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ error: error.message, details: error.details });
+    }
+    if (error.code === "P2002") {
       return res.status(400).json({
-        error: "Validation failed",
-        details: errors,
+        error: "Duplicate field",
+        details: [error.meta.target.join(", ")],
       });
     }
 
@@ -67,7 +69,7 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
     const { fullName, id, password } = req.body;
 
     // Find user by name and Israeli ID
-    const user = await prisma.findUnique({
+    const user = await prisma.user.findFirst({
       where: { AND: [{ fullName: { equals: fullName, mode: "insensitive" } }, { id }] },
     });
 

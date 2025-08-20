@@ -66,7 +66,7 @@ const MainPage = () => {
               <span>
                 <strong>🆔 Israeli ID:</strong>
               </span>
-              <span>{user.israeliId}</span>
+              <span>{user.id}</span>
             </div>
 
             <div className="user-detail">

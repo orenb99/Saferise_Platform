@@ -62,7 +62,7 @@ const validateSignin = [
     .isLength({ max: 100 })
     .withMessage("Full name cannot exceed 100 characters"),
 
-  body("israeliId")
+  body("id")
     .isLength({ min: 9, max: 9 })
     .withMessage("ID must be exactly 9 digits")
     .isNumeric()

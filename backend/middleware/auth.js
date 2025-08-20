@@ -13,23 +13,23 @@ const verifyToken = async (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ error: "Access denied. No token provided." });
+      return res.status(403).json({ error: "Access denied. No token provided." });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid token. User not found." });
+      return res.status(403).json({ error: "Invalid token. User not found." });
     }
 
     req.user = user;
     next();
   } catch (error) {
     if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ error: "Invalid token." });
+      return res.status(403).json({ error: "Invalid token." });
     } else if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ error: "Token expired." });
+      return res.status(403).json({ error: "Token expired." });
     }
     res.status(500).json({ error: "Server error during token verification." });
   }

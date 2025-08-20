@@ -27,8 +27,7 @@ function validateFullName(name) {
 function validateEmail(email) {
   // Validate lowercase and correct format
   return (
-    email.match(/[A-Z]/) === null &&
-    email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/) === null
+    email.match(/[A-Z]/) === null && email.match(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
   );
 }
 function validatePassword(password) {
@@ -38,18 +37,25 @@ function validatePassword(password) {
 
 // Validate all fields and trim
 function validateFields(user) {
+  let errs = [];
+
   if (user.email) {
     user.email = user.email.trim();
-    if (!validateEmail(user.email)) throw new Error("Please enter a valid email!");
+    if (!validateEmail(user.email)) errs.push("Please enter a valid email!");
   }
   if (user.fullName) {
     user.fullName = user.fullName.trim();
-    if (!validateFullName(user.fullName)) throw new Error("Full name is between 2 and 100 letters");
+    if (!validateFullName(user.fullName)) errs.push("Full name is between 2 and 100 letters");
   }
-  if (user.password & !validatePassword(user.password))
-    throw new Error("Please enter a valid password");
-  if (user.id & !validateIsraeliID(user.id)) throw new Error("Please enter a valid id");
-  return true;
+  if (user.password && !validatePassword(user.password)) errs.push("Please enter a valid password");
+  if (user.id && !validateIsraeliID(user.id)) errs.push("Please enter a valid id");
+
+  if (errs.length > 0) {
+    const err = new Error("Validation failed");
+    err.name = "ValidationError";
+    err.details = errs;
+    throw err;
+  }
 }
 
 // Remove password from JSON output

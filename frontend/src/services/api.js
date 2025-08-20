@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 10000, // 10 seconds timeout
 });
@@ -14,7 +14,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,11 +29,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 403) {
       // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/signin';
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/signin";
     }
     return Promise.reject(error);
   }
@@ -43,60 +43,60 @@ api.interceptors.response.use(
 export const authAPI = {
   signUp: async (userData) => {
     try {
-      const response = await api.post('/auth/signup', userData);
+      const response = await api.post("/auth/signup", userData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Network error occurred' };
+      throw error.response?.data || { error: "Network error occurred" };
     }
   },
 
   signIn: async (credentials) => {
     try {
-      const response = await api.post('/auth/signin', credentials);
+      const response = await api.post("/auth/signin", credentials);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Network error occurred' };
+      throw error.response?.data || { error: "Network error occurred" };
     }
   },
 
   getCurrentUser: async () => {
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get("/auth/me");
       return response.data;
     } catch (error) {
-      throw error.response?.data || { error: 'Network error occurred' };
+      throw error.response?.data || { error: "Network error occurred" };
     }
-  }
+  },
 };
 
 // Utility functions for local storage
 export const tokenStorage = {
   set: (token) => {
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
   },
-  
+
   get: () => {
-    return localStorage.getItem('token');
+    return localStorage.getItem("token");
   },
-  
+
   remove: () => {
-    localStorage.removeItem('token');
-  }
+    localStorage.removeItem("token");
+  },
 };
 
 export const userStorage = {
   set: (user) => {
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem("user", JSON.stringify(user));
   },
-  
+
   get: () => {
-    const user = localStorage.getItem('user');
+    const user = localStorage.getItem("user");
     return user ? JSON.parse(user) : null;
   },
-  
+
   remove: () => {
-    localStorage.removeItem('user');
-  }
+    localStorage.removeItem("user");
+  },
 };
 
 export default api;
