@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("../models/User");
+const prisma = require("../prisma/prisma-client");
 const { generateToken, verifyToken } = require("../middleware/auth");
 const { sanitizeInput, validateSignup, validateSignin } = require("../middleware/validation");
 
@@ -8,47 +8,45 @@ const router = express.Router();
 // Sign Up Route
 router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
   try {
-    const { fullName, email, israeliId, role, password } = req.body;
+    const { fullName, email, id, role, password } = req.body;
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { israeliId }],
-    });
+    const existingUser = await prisma.findUnique({ where: { OR: [{ email }, { id }] } });
 
     if (existingUser) {
-      const field = existingUser.email === email ? "email" : "Israeli ID";
+      const field = existingUser.email === email ? "email" : "ID";
       return res.status(400).json({
         error: `User with this ${field} already exists`,
       });
     }
 
     // Create new user
-    const user = new User({
-      fullName,
-      email,
-      israeliId,
-      role,
-      password,
+    const user = await prisma.user.create({
+      data: {
+        id,
+        fullName,
+        email,
+        role,
+        password,
+      },
     });
 
-    await user.save();
-
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.status(201).json({
       message: "User created successfully",
       token,
       user: {
-        id: user._id,
         fullName: user.fullName,
         email: user.email,
-        israeliId: user.israeliId,
+        id: user.id,
         role: user.role,
       },
     });
   } catch (error) {
     console.error("Signup error:", error);
 
+    // CHECK!!!
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({
@@ -66,12 +64,11 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
 // Sign In Route
 router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
   try {
-    const { fullName, israeliId, password } = req.body;
+    const { fullName, id, password } = req.body;
 
     // Find user by name and Israeli ID
-    const user = await User.findOne({
-      fullName: { $regex: new RegExp(`^${fullName}$`, "i") },
-      israeliId,
+    const user = await prisma.findUnique({
+      where: { AND: [{ fullName: { equals: fullName, mode: "insensitive" } }, { id }] },
     });
 
     if (!user) {
@@ -81,7 +78,7 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
     }
 
     // Check password
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await prisma.user.comparePassword(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -90,16 +87,15 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.json({
       message: "Sign in successful",
       token,
       user: {
-        id: user._id,
+        id: user.id,
         fullName: user.fullName,
         email: user.email,
-        israeliId: user.israeliId,
         role: user.role,
       },
     });
@@ -116,10 +112,9 @@ router.get("/me", verifyToken, async (req, res) => {
   try {
     res.json({
       user: {
-        id: req.user._id,
+        id: req.user.id,
         fullName: req.user.fullName,
         email: req.user.email,
-        israeliId: req.user.israeliId,
         role: req.user.role,
       },
     });

@@ -48,8 +48,7 @@ function validateFields(user) {
   }
   if (user.password & !validatePassword(user.password))
     throw new Error("Please enter a valid password");
-  if (user.israeliId & !validateIsraeliID(user.israeliId))
-    throw new Error("Please enter a valid id");
+  if (user.id & !validateIsraeliID(user.id)) throw new Error("Please enter a valid id");
   return true;
 }
 

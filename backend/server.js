@@ -2,14 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const mongoSanitize = require("express-mongo-sanitize");
 const authRoutes = require("./routes/auth");
+const connectDB = require("./prisma/database");
 
 // Load environment variables
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Security middleware
 app.use(
@@ -24,6 +24,8 @@ app.use(
     },
   })
 );
+// Test connection to database
+connectDB();
 
 // Rate limiting
 const limiter = rateLimit({
@@ -65,9 +67,6 @@ app.use(
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Sanitize data to prevent NoSQL injection
-app.use(mongoSanitize());
 
 // Health check route
 app.get("/health", (req, res) => {

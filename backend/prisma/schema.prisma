@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  israeliId String   @id
+  id String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   fullName  String

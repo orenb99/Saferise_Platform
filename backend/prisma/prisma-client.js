@@ -1,15 +1,16 @@
-const { PrismaClient } = require("prisma/client");
+const { PrismaClient } = require("@prisma/client");
 // Custom schema functions
-const prisma = new PrismaClient().$extends({
-  model: {
-    user: {
-      // Compare password method
-      async comparePassword(candidatePassword, encryptedPassword) {
-        return await bcrypt.compare(candidatePassword, encryptedPassword);
-      },
-    },
-  },
-});
+const prisma = new PrismaClient();
+// .$extends({
+//   model: {
+//     user: {
+//       // Compare password method
+//       async comparePassword(candidatePassword, encryptedPassword) {
+//         return await bcrypt.compare(candidatePassword, encryptedPassword);
+//       },
+//     },
+//   },
+// });
 // Middlewares
 prisma.$use(async (params, next) => {
   if (params.model === "User") {
