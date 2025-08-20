@@ -1,0 +1,242 @@
+erDiagram
+    %% Product Entity - סוגי מוצרים
+    Product {
+        string ProductId PK "מזהה מוצר"
+        string Name "שם המוצר"
+        int ZG_ProductFamily "סוג מוצר (1=מעלית, 2=מעלון)"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Address Entity - כתובת המתקן
+    Address {
+        string AddressId PK "מזהה כתובת"
+        int ZG_Address_Type "סוג כתובת (1=יישוב רחוב, 2=גוש חלקה, 3=קואורדינטות)"
+        int ZG_City "קוד יישוב"
+        int ZG_Street "קוד רחוב"
+        int ZG_Home_Number "מספר בית"
+        int ZG_Apartment_Number "מספר דירה"
+        int ZG_Home_Entrance "מספר כניסה"
+        int ZG_ZipCode "מיקוד"
+        decimal ZG_Geolocation_Latitude "קואורדינטה X"
+        decimal ZG_Geolocation_Longitude "קואורדינטה Y"
+        int ZG_Block "גוש"
+        int ZG_plot "חלקה"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Site Entity - פרטי אתר
+    Site {
+        string SiteId PK "מזהה אתר"
+        string AddressId FK "מזהה כתובת"
+        string SiteAccountId FK "מזהה אחראי האתר"
+        int ZG_Site_Type "סוג האתר"
+        int ES_Designation "ייעוד האתר"
+        string ES_OfficeSerialNumber "מספר מזהה אפיק"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Account_SiteOwner Entity - אחראי על האתר
+    Account_SiteOwner {
+        string AccountId PK "מזהה חשבון"
+        string Name "שם"
+        int ZG_IdentityType "סוג זיהוי"
+        string Business_Id "מספר מזהה ארגון"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Account_AssetOwner Entity - בעל המתקן
+    Account_AssetOwner {
+        string AccountId PK "מזהה חשבון"
+        string Name "שם"
+        int ZG_IdentityType "סוג זיהוי"
+        string Business_Id "מספר מזהה ארגון"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Asset Entity - המתקן (המעלית)
+    Asset {
+        string AssetId PK "מזהה מתקן"
+        string ProductId FK "מזהה מוצר"
+        string SiteId FK "מזהה אתר"
+        string AssetOwnerId FK "מזהה בעל המתקן"
+        string Name "שם המתקן"
+        date ES_InstallDate "תאריך התקנה"
+        int ES_AssetPurpose "ייעוד המתקן"
+        string ES_SerialNumber "מספר המעלית (משרד העבודה)"
+        string ES_OfficeSerialNumber "מספר מתקן אפיק"
+        int ES_Status "מצב המתקן"
+        string ES_Marking "סימון מתקן"
+        int Es_OwnerType "סוג המחזיק במתקן"
+        date ES_ManufactureDate "תאריך ייצור"
+        string ES_EngineNumber "מספר מנוע"
+        int ES_CellDoorType "סוג דלת תא"
+        int ES_ShaftDoorType "סוג דלת פיר"
+        int ES_NumberOfdoors "מספר דלתות"
+        text ES_Description "תיאור"
+        date ES_UsageEndDate "תאריך סיום שימוש"
+        int ES_NumberOfStations "מספר תחנות"
+        decimal ES_MetersHeight "גובה במטרים"
+        decimal ES_Weight "משקל נשיאה מותר"
+        int ES_maxPassengers "מספר נוסעים מירבי"
+        boolean Es_IsLifting "הגבהה"
+        date ES_LiftingDate "תאריך הגבהה"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Account_Reviewer Entity - בודק מוסמך
+    Account_Reviewer {
+        string AccountId PK "מזהה חשבון"
+        string FirstName "שם פרטי"
+        string LastName "שם משפחה"
+        string PhoneNumber "מספר טלפון"
+        string Email "כתובת מייל"
+        int ZG_IdentityType "סוג זיהוי"
+        string Pa_ID_Number "מספר ת.ז."
+        boolean IsActive "פעיל"
+        date CertificationExpiry "תוקף הסמכה"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Account_Technician Entity - טכנאי מלווה
+    Account_Technician {
+        string AccountId PK "מזהה חשבון"
+        string FirstName "שם פרטי"
+        string LastName "שם משפחה"
+        int ZG_IdentityType "סוג זיהוי"
+        string Pa_ID_Number "מספר ת.ז."
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Review Entity - התסקיר
+    Review {
+        string ReviewId PK "מזהה תסקיר"
+        string AssetId FK "מזהה מתקן"
+        string ReviewerId FK "מזהה בודק"
+        string TechnicianId FK "מזהה טכנאי (אופציונלי)"
+        datetime ES_ReviewDate "תאריך ושעת ביצוע התסקיר"
+        string ES_AssetSystemSource "המערכת ממנה הופק התסקיר"
+        int ES_ReviewReason "סיבת ביצוע התסקיר"
+        string ES_ReviewerNumber "מספר תסקיר במערכת המקור"
+        int ES_ReviewerDecision "החלטת הבודק"
+        int ES_TotalRedeemDays "מספר ימים כולל לביצוע"
+        decimal ES_MaxWeightAllowed "משקל מקסימלי לאחר טיפול"
+        int ES_MaxPassengers "מספר מקסימלי נוסעים לאחר טיפול"
+        text ES_Summary "סיכום כללי"
+        boolean IsProcessed "עובד"
+        string ProcessingStatus "סטטוס עיבוד"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% ReviewInstruction Entity - הנחיות לתסקיר
+    ReviewInstruction {
+        string InstructionId PK "מזהה הנחיה"
+        string ReviewId FK "מזהה תסקיר"
+        string ES_Product_Instruction "הנחיה לפי מוצר"
+        int ES_NumberOfDaysToPursue "המלצה למספר ימים לביצוע"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% ReviewAssembly Entity - נושאים במכללים שנבדקו
+    ReviewAssembly {
+        string AssemblyId PK "מזהה בדיקת מכלול"
+        string ReviewId FK "מזהה תסקיר"
+        string Assembly_Subject "מזהה מכלול ונושא למוצר"
+        int ES_AssemblyStatus "סטטוס (1=תקין, 2=לא תקין, 3=לא נבדק)"
+        text ES_AssemblyNotes "הערות"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% ReviewDefect Entity - כשלים בתסקיר
+    ReviewDefect {
+        string DefectId PK "מזהה ליקוי"
+        string ReviewId FK "מזהה תסקיר"
+        string Assembly_Subject "נושא במכלול"
+        string Subject_Finding "מזהה ממצא לפי נושא במכלול"
+        text ES_DefectDescription "תיאור התקלה"
+        int Severity "דרגת חומרה"
+        boolean IsResolved "טופל"
+        datetime ResolvedDate "תאריך טיפול"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Orders Entity - צווי בטיחות (מוסק מהאפיון)
+    Orders {
+        string OrderId PK "מזהה צו"
+        string ReviewId FK "מזהה תסקיר"
+        string InspectorId FK "מזהה מפקח"
+        int OrderType "סוג צו (1=השבתה מיידי, 2=תיקון ליקויים, 3=אישור תקינות)"
+        text OrderContent "תוכן הצו"
+        date IssueDate "תאריך הפקה"
+        date DueDate "מועד ביצוע נדרש"
+        int Status "סטטוס צו"
+        boolean IsActive "פעיל"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Inspector Entity - מפקח (מוסק מהאפיון)
+    Inspector {
+        string InspectorId PK "מזהה מפקח"
+        string FirstName "שם פרטי"
+        string LastName "שם משפחה"
+        string Email "כתובת מייל"
+        string PhoneNumber "טלפון"
+        int InspectorType "סוג מפקח (1=ראשי, 2=אזורי)"
+        string Region "אזור אחריות"
+        boolean IsActive "פעיל"
+        datetime CreatedDate "תאריך יצירה"
+        datetime ModifiedDate "תאריך עדכון"
+    }
+
+    %% Relationships - קשרים בין הישויות
+
+    %% Product to Asset (One to Many)
+    Product ||--o{ Asset : "has"
+
+    %% Address to Site (One to Many)
+    Address ||--o{ Site : "located_at"
+
+    %% Account_SiteOwner to Site (One to Many)
+    Account_SiteOwner ||--o{ Site : "owns"
+
+    %% Site to Asset (One to Many)
+    Site ||--o{ Asset : "contains"
+
+    %% Account_AssetOwner to Asset (One to Many)
+    Account_AssetOwner ||--o{ Asset : "owns"
+
+    %% Asset to Review (One to Many)
+    Asset ||--o{ Review : "inspected_in"
+
+    %% Account_Reviewer to Review (One to Many)
+    Account_Reviewer ||--o{ Review : "performs"
+
+    %% Account_Technician to Review (One to Many - Optional)
+    Account_Technician ||--o{ Review : "accompanies"
+
+    %% Review to ReviewInstruction (One to Many)
+    Review ||--o{ ReviewInstruction : "has_instructions"
+
+    %% Review to ReviewAssembly (One to Many)
+    Review ||--o{ ReviewAssembly : "includes_assembly_checks"
+
+    %% Review to ReviewDefect (One to Many)
+    Review ||--o{ ReviewDefect : "identifies_defects"
+
+    %% Review to Orders (One to Many)
+    Review ||--o{ Orders : "generates"
+
+    %% Inspector to Orders (One to Many)
+    Inspector ||--o{ Orders : "issues"

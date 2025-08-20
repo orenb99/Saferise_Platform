@@ -26,3 +26,65 @@ enum Role {
   Supervisor
   Director
 }
+
+model Product {
+  id String @id
+  name String
+  productFamily ProductFamily 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProductFamily {
+  Elevator // מעלית
+  Lift // מעלון
+}
+
+model Address {
+  id String @id
+  addressType AddressType
+  city integer?
+  street integer?
+  houseNumber integer
+  houseEntrance integer
+  zipcode integer
+  geolocationLatitude decimal?
+  geolocationLongitude decimal?
+  block integer?
+  plot integer?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AddressType {
+  Street
+  Plot
+  Coordinates
+}
+
+model Site {
+  id String @id
+  addressId String @relation() // Later
+  siteAccountId string @relation() // Later
+  siteType SiteType
+  designation SiteDesignation
+  officialSerialNumber String // Unique?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+enum SiteType{
+  Residential
+  Industrial
+  Construction
+  Services
+  Government
+}
+enum SiteDesignation{
+  Residential
+  Hotel
+  Hospital
+  Government
+  Industrial
+  ShoppingCenter
+  Mall
+}
