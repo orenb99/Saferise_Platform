@@ -2,8 +2,10 @@ import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { LogOut, User, Shield, Mail, IdCard } from "lucide-react";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
+  let navigate = useNavigate();
   const { user, logout } = useAuth();
 
   if (!user) {
@@ -46,7 +48,9 @@ const MainPage = () => {
 
       <main className="main-content">
         <div className="welcome-card">
-          <h1 className="welcome-title">Welcome to Saferise! 👋</h1>
+          <h1 className="welcome-title">
+            <span>Welcome to Saferise!</span> 👋
+          </h1>
           <p className="welcome-subtitle">Your secure employee management dashboard</p>
 
           <div className="user-info">
@@ -110,6 +114,16 @@ const MainPage = () => {
             >
               ✅ You are successfully authenticated and logged in!
             </p>
+          </div>
+        </div>
+        <div
+          className="inspection-card sub-card"
+          onClick={() => {
+            navigate("/inspections");
+          }}
+        >
+          <div className="welcome-title">
+            🔎 <span>Search for Inspections</span>
           </div>
         </div>
       </main>

@@ -154,7 +154,7 @@ function InspectionPage() {
         </div>
       </div>
       {openInspectionId ? (
-        <InspectionPopUp close={() => setOpenInspectionId(0)} id={openInspectionId} />
+        <InspectionPopUp setId={setOpenInspectionId} id={openInspectionId} />
       ) : (
         ""
       )}

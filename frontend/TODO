@@ -1,3 +1,1 @@
 1. Save token in a cookie and not in localstorage
-2. Save user in a state and not in localstorage
-3. Hide signin and signup pages for logged in users
