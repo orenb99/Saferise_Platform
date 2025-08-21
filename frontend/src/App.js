@@ -7,6 +7,8 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
 import AlertsPage from "./pages/AlertsPage";
+import GuestRoute from "./components/GuestRoute";
+import InspectionPage from "./pages/InspectionPage";
 
 function App() {
   return (
@@ -38,9 +40,23 @@ function App() {
             {/* Redirect root to signup */}
             <Route path="/" element={<Navigate to="/signup" replace />} />
 
-            {/* Public routes */}
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
+            {/* Guest routes */}
+            <Route
+              path="/signup"
+              element={
+                <GuestRoute>
+                  <SignUp />
+                </GuestRoute>
+              }
+            />
+            <Route
+              path="/signin"
+              element={
+                <GuestRoute>
+                  <SignIn />
+                </GuestRoute>
+              }
+            />
 
             {/* Protected routes */}
             <Route
@@ -56,6 +72,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AlertsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inspections"
+              element={
+                <ProtectedRoute>
+                  <InspectionPage />
                 </ProtectedRoute>
               }
             />

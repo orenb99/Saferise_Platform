@@ -57,29 +57,30 @@ model Address {
 }
 
 enum AddressType {
-  Street
-  Plot
-  Coordinates
+  Street // רחוב
+  Plot // חלקה
+  Coordinates // קואורדינטות
 }
 
 model Site {
-  id String @id
+  id String @id  // מזהה יחודי
   addressId String @relation() // Later
   siteAccountId string @relation() // Later
-  siteType SiteType
-  designation SiteDesignation
-  officialSerialNumber String // Unique?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  siteType SiteType  // סוג אתר
+  designation SiteDesignation // ייעוד אתר
+  officialSerialNumber String // Unique? // מספר מזהה אפיק
+  createdAt DateTime @default(now()) // תאריך יצירה
+  updatedAt DateTime @updatedAt // תאריך עדכון
 }
-enum SiteType{
-  Residential
-  Industrial
-  Construction
-  Services
-  Government
+
+enum SiteType{ // סוג אתר
+  Residential // מגורים
+  Industrial // תעשייה
+  Construction // אתר בנייה
+  Services // שירותים ומסחר
+  Government // ממשלתי
 }
-enum SiteDesignation{
+enum SiteDesignation{ // יעוד אתר
   Residential
   Hotel
   Hospital
@@ -87,4 +88,60 @@ enum SiteDesignation{
   Industrial
   ShoppingCenter
   Mall
+}
+
+model Asset  { // המתקן (המעלית)
+  AssetId              String   @id @db.VarChar(255) // מזהה מתקן
+  ProductId            String   // FK -> Later
+  SiteId               String   // FK -> Later
+  AssetOwnerId         String   // FK -> Later
+  Name                 String   // שם המתקן
+  ES_InstallDate       DateTime @db.Date             // תאריך התקנה
+  ES_AssetPurpose      Int      // ייעוד המתקן
+  ES_SerialNumber      String   // מספר המעלית (משרד העבודה)
+  ES_OfficeSerialNumber String  // מספר מתקן אפיק
+  ES_Status            Int      // מצב המתקן
+  ES_Marking           String   // סימון מתקן
+  Es_OwnerType         Int      // סוג המחזיק במתקן
+  ES_ManufactureDate   DateTime @db.Date             // תאריך ייצור
+  ES_EngineNumber      String   // מספר מנוע
+  ES_CellDoorType      Int      // סוג דלת תא
+  ES_ShaftDoorType     Int      // סוג דלת פיר
+  ES_NumberOfdoors     Int      // מספר דלתות
+  ES_Description       String?  @db.Text             // תיאור
+  ES_UsageEndDate      DateTime? @db.Date            // תאריך סיום שימוש
+  ES_NumberOfStations  Int      // מספר תחנות
+  ES_MetersHeight      Decimal  @db.Decimal(10, 2)   // גובה במטרים
+  ES_Weight            Decimal  @db.Decimal(10, 2)   // משקל נשיאה מותר
+  ES_maxPassengers     Int      // מספר נוסעים מירבי
+  Es_IsLifting         Boolean  // הגבהה
+  ES_LiftingDate       DateTime? @db.Date            // תאריך הגבהה
+  CreatedDate          DateTime // תאריך יצירה
+  ModifiedDate         DateTime // תאריך עדכון
+
+}
+
+model Review {
+  ReviewId             String   @id @db.VarChar(255) // מזהה תסקיר
+  AssetId              String   // FK -> Later
+  ReviewerId           String   // FK -> Later
+  TechnicianId         String?  // FK -> Later (optional)
+  ES_ReviewDate        DateTime // תאריך ושעת ביצוע התסקיר
+  ES_AssetSystemSource String   // המערכת ממנה הופק התסקיר
+  ES_ReviewReason      Int      // סיבת ביצוע התסקיר
+  ES_ReviewerNumber    String   // מספר תסקיר במערכת המקור
+  ES_ReviewerDecision  Int      // החלטת הבודק
+  ES_TotalRedeemDays   Int      // מספר ימים כולל לביצוע
+  ES_MaxWeightAllowed  Decimal  @db.Decimal(10, 2) // משקל מקסימלי לאחר טיפול
+  ES_MaxPassengers     Int      // מספר מקסימלי נוסעים לאחר טיפול
+  ES_Summary           String?  @db.Text           // סיכום כללי
+  IsProcessed          Boolean  // עובד
+  ProcessingStatus     String   // סטטוס עיבוד
+  CreatedDate          DateTime // תאריך יצירה
+  ModifiedDate         DateTime // תאריך עדכון
+
+  // Relations - to define later
+  // asset      Asset       @relation(fields: [AssetId], references: [AssetId])       // Later
+  // reviewer   Reviewer    @relation(fields: [ReviewerId], references: [id])        // Later
+  // technician Technician? @relation(fields: [TechnicianId], references: [id])      // Later
 }

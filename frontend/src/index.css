@@ -76,7 +76,28 @@ code {
   color: #333;
   font-size: 0.9rem;
 }
-
+.form-container .form-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-evenly;
+  align-items: center;
+  width: min-content;
+}
+.form-group .form-row .checkbox {
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.form-row .checkbox .form-input {
+  margin-right: 3px;
+}
+.form-row .checkbox .form-label {
+  margin: 0;
+}
 .form-input {
   width: 100%;
   padding: 12px 16px;
@@ -85,6 +106,9 @@ code {
   font-size: 16px;
   transition: all 0.3s ease;
   background: #fff;
+}
+.form-input[type="date"] {
+  width: min-content;
 }
 
 .form-input:focus {
@@ -295,6 +319,33 @@ code {
   min-height: 200px;
   font-size: 1.1rem;
   color: #666;
+}
+/* Popup and Popup overlay */
+.popup-overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent */
+  transition: 0.3 ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.popup-overlay .popup {
+  background: white;
+  opacity: 1;
+  color: black;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 794px;
+  width: max-content;
+  height: max-content;
+  width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease-out;
 }
 
 @media (max-width: 768px) {

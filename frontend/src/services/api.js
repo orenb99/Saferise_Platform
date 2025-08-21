@@ -84,19 +84,4 @@ export const tokenStorage = {
   },
 };
 
-export const userStorage = {
-  set: (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
-  },
-
-  get: () => {
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
-  },
-
-  remove: () => {
-    localStorage.removeItem("user");
-  },
-};
-
 export default api;

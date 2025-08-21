@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { authAPI, tokenStorage, userStorage } from "../services/api";
+import { authAPI, tokenStorage } from "../services/api";
 import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
 // Auth reducer
 const authReducer = (state, action) => {
+  // console.log(state, action);
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -43,9 +44,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const token = tokenStorage.get();
-      const savedUser = userStorage.get();
-
-      if (token && savedUser) {
+      if (token) {
         try {
           // Verify token is still valid
           const response = await authAPI.getCurrentUser();
@@ -53,7 +52,6 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           // Token is invalid, clear storage
           tokenStorage.remove();
-          userStorage.remove();
           dispatch({ type: "SET_USER", payload: null });
         }
       } else {
@@ -71,7 +69,6 @@ export const AuthProvider = ({ children }) => {
 
       // Store token and user data
       tokenStorage.set(response.token);
-      userStorage.set(response.user);
 
       dispatch({ type: "SET_USER", payload: response.user });
       toast.success("Account created successfully!");
@@ -92,7 +89,6 @@ export const AuthProvider = ({ children }) => {
 
       // Store token and user data
       tokenStorage.set(response.token);
-      userStorage.set(response.user);
 
       dispatch({ type: "SET_USER", payload: response.user });
       toast.success(`Welcome back, ${response.user.fullName}!`);
@@ -108,7 +104,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     tokenStorage.remove();
-    userStorage.remove();
     dispatch({ type: "LOGOUT" });
     toast.success("Logged out successfully");
   };
