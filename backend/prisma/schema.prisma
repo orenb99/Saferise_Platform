@@ -12,7 +12,7 @@ datasource db {
 }
 
 model User {
-  id String   @id
+  id String   @id @db.VarChar(9)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   fullName  String
@@ -22,17 +22,18 @@ model User {
 }
 
 enum Role {
-  Employee
-  Supervisor
-  Director
+  Employee  // עובד
+  Supervisor  // מפקח
+  Director  // מנהל
 }
 
 model Product {
-  id String @id
-  name String
-  productFamily ProductFamily 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  productId String @id // מזהה מוצר
+  name String // שם מוצר
+  productFamily ProductFamily // משפחת מוצר
+  createdAt DateTime @default(now()) // תאריך יצירה
+  updatedAt DateTime @updatedAt // תאריך עדכון
+  assets Asset[] // קשר למתקנים
 }
 
 enum ProductFamily {
@@ -41,19 +42,20 @@ enum ProductFamily {
 }
 
 model Address {
-  id String @id
-  addressType AddressType
-  city integer?
-  street integer?
-  houseNumber integer
-  houseEntrance integer
-  zipcode integer
-  geolocationLatitude decimal?
-  geolocationLongitude decimal?
-  block integer?
-  plot integer?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  addressId String @id  // מזהה כתובת
+  addressType AddressType // סוג כתובת
+  city Int? // עיר
+  street Int? // רחוב
+  houseNumber Int // מספר בית
+  houseEntrance Int // כניסה
+  zipcode Int // מיקוד
+  geoLocationLatitude Decimal?  // קו אורך
+  geoLocationLongitude Decimal? // קו רוחב
+  block Int?  // גוש
+  plot Int? // חלקה
+  createdAt DateTime @default(now())  // תאריך יצירה
+  updatedAt DateTime @updatedAt // תאריך עדכון  
+  sites Site[] // קשר לאתרים
 }
 
 enum AddressType {
@@ -63,14 +65,17 @@ enum AddressType {
 }
 
 model Site {
-  id String @id  // מזהה יחודי
-  addressId String @relation() // Later
-  siteAccountId string @relation() // Later
+  siteId String @id  // מזהה יחודי
+  addressId String // FK
+  address Address  @relation(fields: [addressId], references: [addressId]) // קשר לכתובת
+  siteAccountId String  // FK
+  siteOwner AccountSiteOwner @relation(fields: [siteAccountId], references: [accountId])  // קשר לבעל האתר
   siteType SiteType  // סוג אתר
   designation SiteDesignation // ייעוד אתר
   officialSerialNumber String // Unique? // מספר מזהה אפיק
   createdAt DateTime @default(now()) // תאריך יצירה
   updatedAt DateTime @updatedAt // תאריך עדכון
+  assets Asset[] // קשר למתקנים
 }
 
 enum SiteType{ // סוג אתר
@@ -81,67 +86,243 @@ enum SiteType{ // סוג אתר
   Government // ממשלתי
 }
 enum SiteDesignation{ // יעוד אתר
-  Residential
-  Hotel
-  Hospital
-  Government
-  Industrial
-  ShoppingCenter
-  Mall
+  Residential // מגורים
+  Hotel // מלון
+  Hospital  // בית חולים
+  Government  // ממשלתי
+  Industrial  // תעשייה
+  ShoppingCenter // מרכז קניות
+  Mall    // קניון
 }
 
-model Asset  { // המתקן (המעלית)
-  AssetId              String   @id @db.VarChar(255) // מזהה מתקן
-  ProductId            String   // FK -> Later
-  SiteId               String   // FK -> Later
-  AssetOwnerId         String   // FK -> Later
-  Name                 String   // שם המתקן
-  ES_InstallDate       DateTime @db.Date             // תאריך התקנה
-  ES_AssetPurpose      Int      // ייעוד המתקן
-  ES_SerialNumber      String   // מספר המעלית (משרד העבודה)
-  ES_OfficeSerialNumber String  // מספר מתקן אפיק
-  ES_Status            Int      // מצב המתקן
-  ES_Marking           String   // סימון מתקן
-  Es_OwnerType         Int      // סוג המחזיק במתקן
-  ES_ManufactureDate   DateTime @db.Date             // תאריך ייצור
-  ES_EngineNumber      String   // מספר מנוע
-  ES_CellDoorType      Int      // סוג דלת תא
-  ES_ShaftDoorType     Int      // סוג דלת פיר
-  ES_NumberOfdoors     Int      // מספר דלתות
-  ES_Description       String?  @db.Text             // תיאור
-  ES_UsageEndDate      DateTime? @db.Date            // תאריך סיום שימוש
-  ES_NumberOfStations  Int      // מספר תחנות
-  ES_MetersHeight      Decimal  @db.Decimal(10, 2)   // גובה במטרים
-  ES_Weight            Decimal  @db.Decimal(10, 2)   // משקל נשיאה מותר
-  ES_maxPassengers     Int      // מספר נוסעים מירבי
-  Es_IsLifting         Boolean  // הגבהה
-  ES_LiftingDate       DateTime? @db.Date            // תאריך הגבהה
-  CreatedDate          DateTime // תאריך יצירה
-  ModifiedDate         DateTime // תאריך עדכון
-
+model AccountSiteOwner {
+  accountId     String   @id      // מזהה חשבון (PK)
+  name          String   // שם
+  identityType  identityType      // סוג זיהוי
+  businessId            String   // מספר מזהה ארגון
+  createdAt     DateTime @default(now()) // תאריך יצירה
+  updatedAt     DateTime @updatedAt      // תאריך עדכון
+  sites Site[] // קשר לאתרים
 }
 
+model AccountAssetOwner {
+  accountId     String   @id      // מזהה חשבון (PK)
+  name          String   // שם
+  identityType  identityType      // סוג זיהוי
+  businessId            String   // מספר מזהה ארגון
+  createdAt     DateTime @default(now()) // תאריך יצירה
+  updatedAt     DateTime @updatedAt      // תאריך עדכון
+  assets Asset[] // קשר למתקנים
+}
+
+enum identityType{
+  AuthorizedDealer // עוסק מורשה
+  Association // עמותה
+  PrivateCompany // ח.פ
+}
+
+model Asset {
+  assetId             String   @id      // מזהה מתקן (PK)
+  productId           String   // מזהה מוצר (FK)
+  product             Product  @relation(fields: [productId], references: [productId]) // קשר למוצר
+  siteId              String   // מזהה אתר (FK)
+  site                Site     @relation(fields: [siteId], references: [siteId]) // קשר לאתר
+  assetOwnerId        String   // מזהה בעל המתקן (FK)
+  assetOwner         AccountAssetOwner @relation(fields: [assetOwnerId], references: [accountId]) // קשר לבעל המתקן
+  name                String   // שם המתקן
+  installDate         DateTime // תאריך התקנה
+  assetPurpose        AssetPurpose      // ייעוד המתקן
+  serialNumber        String   // מספר המעלית (משרד העבודה)
+  officeSerialNumber  String   // מספר מתקן אפיק
+  status              Status      // מצב המתקן
+  marking             String   // סימון מתקן
+  ownerType           OwnerType      // סוג המחזיק במתקן
+  manufactureDate     DateTime // תאריך ייצור
+  engineNumber        String   // מספר מנוע
+  cellDoorType        CellDoorType      // סוג דלת תא
+  shaftDoorType       ShaftDoorType      // סוג דלת פיר
+  numberOfDoors       Int      // מספר דלתות
+  description         String  @db.Text  // תיאור
+  usageEndDate        DateTime // תאריך סיום שימוש
+  numberOfStations    Int      // מספר תחנות
+  metersHeight        Decimal  // גובה במטרים
+  weight              Decimal  // משקל נשיאה מותר
+  maxPassengers       Int      // מספר נוסעים מירבי
+  isLifting           Boolean  // הגבהה
+  liftingDate         DateTime // תאריך הגבהה
+  createdAt           DateTime @default(now()) // תאריך יצירה
+  updatedAt           DateTime @updatedAt      // תאריך עדכון
+  reviews Review[] // קשר לתסקירים
+}
+enum AssetPurpose{
+  PassengerElevator // מעלית נוסעים
+  FrightList // מעלית משא
+  Service // שירות
+  Construction // בניין
+  Other // אחר
+}
+enum Status{
+  Active // פעיל
+  Disabled // מושבת
+}
+enum OwnerType{
+  Company // חברה
+  HouseComnittee // ועד בית
+  PrivatePerson // אדם פרטי
+}
+
+enum CellDoorType{
+ Wing // כנף
+ AutoCenter // אוטומטיות מרכזיות
+ AutoRight // אוטומטיות ימניות
+ AutoLeft // אוטומטיות שמאליות
+ VerticalMaunal // אנכי ידני
+ VerticalAuto // אנכי אוטומטי
+ HorizontalAuto // אופקי אוטומטי
+ None // ללא תא דלת
+}
+enum ShaftDoorType {
+  Auto // אוטומטי
+  Wing // כנף
+  Other //אחר
+}
+
+// Account_Reviewer Entity - בודק מוסמך
+model AccountReviewer {
+  accountId           String   @id      // מזהה חשבון (PK)
+  firstName           String   // שם פרטי
+  lastName            String   // שם משפחה
+  phoneNumber         String   // מספר טלפון
+  email               String   // כתובת מייל
+  identityType        Int      // סוג זיהוי (CHECK LATER)
+  idNumber            String   // מספר ת.ז.
+  isActive            Boolean  // פעיל
+  certificationExpiry DateTime // תוקף הסמכה
+  createdAt           DateTime @default(now()) // תאריך יצירה
+  updatedAt           DateTime @updatedAt      // תאריך עדכון
+  reviews Review[] // קשר לתסקירים
+}
+
+// Review Entity - התסקיר
 model Review {
-  ReviewId             String   @id @db.VarChar(255) // מזהה תסקיר
-  AssetId              String   // FK -> Later
-  ReviewerId           String   // FK -> Later
-  TechnicianId         String?  // FK -> Later (optional)
-  ES_ReviewDate        DateTime // תאריך ושעת ביצוע התסקיר
-  ES_AssetSystemSource String   // המערכת ממנה הופק התסקיר
-  ES_ReviewReason      Int      // סיבת ביצוע התסקיר
-  ES_ReviewerNumber    String   // מספר תסקיר במערכת המקור
-  ES_ReviewerDecision  Int      // החלטת הבודק
-  ES_TotalRedeemDays   Int      // מספר ימים כולל לביצוע
-  ES_MaxWeightAllowed  Decimal  @db.Decimal(10, 2) // משקל מקסימלי לאחר טיפול
-  ES_MaxPassengers     Int      // מספר מקסימלי נוסעים לאחר טיפול
-  ES_Summary           String?  @db.Text           // סיכום כללי
-  IsProcessed          Boolean  // עובד
-  ProcessingStatus     String   // סטטוס עיבוד
-  CreatedDate          DateTime // תאריך יצירה
-  ModifiedDate         DateTime // תאריך עדכון
+  reviewId           String   @id      // מזהה תסקיר (PK)
+  assetId            String   // מזהה מתקן (FK)
+  asset              Asset    @relation(fields: [assetId], references: [assetId]) // קשר למתקן
+  reviewerId         String   // מזהה בודק (FK)
+  reviewer           AccountReviewer @relation(fields: [reviewerId], references: [accountId]) // קשר לבודק
+  technicianId       String?  // מזהה טכנאי (אופציונלי) - nullable
+  reviewDate         DateTime // תאריך ושעת ביצוע התסקיר
+  assetSystemSource  String   // המערכת ממנה הופק התסקיר
+  reviewReason       ReviewReason      // סיבת ביצוע התסקיר
+  reviewerNumber     String   // מספר תסקיר במערכת המקור
+  reviewerDecision   ReviewerDecision      // החלטת הבודק
+  totalRedeemDays    Int      // מספר ימים כולל לביצוע
+  maxWeightAllowed   Decimal  // משקל מקסימלי לאחר טיפול
+  maxPassengers      Int      // מספר מקסימלי נוסעים לאחר טיפול
+  summary            String @db.Text  // סיכום כללי
+  isProcessed        Boolean  // עובד
+  processingStatus   String   // סטטוס עיבוד
+  createdAt          DateTime @default(now()) // תאריך יצירה
+  updatedAt          DateTime @updatedAt      // תאריך עדכון
+  reviewInstructions ReviewInstruction[] // קשר להנחיות לתסקיר
+  reviewAssemblies   ReviewAssembly[] // קשר לנושאים במכללים שנבדקו
+  reviewDefects      ReviewDefect[] // קשר לכשלים בתסקיר
+  orders             Orders[] // קשר לצווי בטיחות
+}
+enum ReviewReason{
+  RoutineCheck // בדיקה שגרתית
+  FirstCheck // ראשונה/מכון התקנים
+  PostFixCheck // נוספת לאחר תיקון
+  PostRecall // לאחר reacall
+  Elevation // הגבהה למעלית בניה
+  DrasticChange // שינוי מהותי
+} 
+enum ReviewerDecision{
+ Operateable // ניתן להפעיל
+ Disable // להשבית
+}
 
-  // Relations - to define later
-  // asset      Asset       @relation(fields: [AssetId], references: [AssetId])       // Later
-  // reviewer   Reviewer    @relation(fields: [ReviewerId], references: [id])        // Later
-  // technician Technician? @relation(fields: [TechnicianId], references: [id])      // Later
+// ReviewInstruction Entity - הנחיות לתסקיר
+model ReviewInstruction {
+  instructionId      String   @id     // מזהה הנחיה (PK)
+  reviewId           String   // מזהה תסקיר (FK)
+  review            Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
+  productInstruction String @db.Text  // הנחיה לפי מוצר
+  numberOfDaysToPursue Int    // המלצה למספר ימים לביצוע
+  createdAt          DateTime @default(now()) // תאריך יצירה
+  updatedAt          DateTime @updatedAt      // תאריך עדכון
+}
+
+// ReviewAssembly Entity - נושאים במכללים שנבדקו
+model ReviewAssembly {
+  assemblyId      String   @id      // מזהה בדיקת מכלול (PK)
+  reviewId        String   // מזהה תסקיר (FK)
+  review         Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
+  subject         String   // מזהה מכלול ונושא למוצר
+  assemblyStatus  AssemblyStatus      // סטטוס
+  assemblyNotes   String @db.Text  // הערות
+  createdAt       DateTime @default(now()) // תאריך יצירה
+  updatedAt       DateTime @updatedAt      // תאריך עדכון
+}
+enum AssemblyStatus{
+  OK // תקין
+  NotOk // לא תקין
+  NotChecked // לא נבדק
+}
+
+// ReviewDefect Entity - כשלים בתסקיר
+model ReviewDefect {
+  defectId           String   @id      // מזהה ליקוי (PK)
+  reviewId           String   // מזהה תסקיר (FK)
+  review            Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
+  subject            String   // נושא במכלול
+  subjectFinding     String @db.Text  // מזהה ממצא לפי נושא במכלול
+  defectDescription  String @db.Text  // תיאור התקלה
+  severity           Int      // דרגת חומרה (CHEK LATER)
+  isResolved         Boolean  // טופל 
+  resolvedDate       DateTime // תאריך טיפול
+  createdAt          DateTime @default(now()) // תאריך יצירה
+  updatedAt          DateTime @updatedAt      // תאריך עדכון
+}
+
+// Orders Entity - צווי בטיחות (מוסק מהאפיון)
+model Orders {
+  orderId      String   @id      // מזהה צו (PK)
+  reviewId     String   // מזהה תסקיר (FK)
+  review       Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
+  inspectorId  String   // מזהה מפקח (FK)
+  inspector    Inspector @relation(fields: [inspectorId], references: [inspectorId]) // קשר למפקח
+  orderType    OrderType      // סוג צו (1=השבתה מיידי, 2=תיקון ליקויים, 3=אישור תקינות)
+  orderContent String @db.Text   // תוכן הצו
+  issueDate    DateTime // תאריך הפקה
+  dueDate      DateTime // מועד ביצוע נדרש
+  status       Int      // סטטוס צו (CHEK LATER)
+  isActive     Boolean  // פעיל
+  createdAt    DateTime @default(now()) // תאריך יצירה
+  updatedAt    DateTime @updatedAt      // תאריך עדכון
+}
+enum OrderType{
+  Disable // השבתה מיידית
+  Fix // תיקון ליקויים
+  Approve // אישור תקינות
+}
+
+// Inspector Entity - מפקח (מוסק מהאפיון)
+model Inspector {
+  inspectorId   String   @id      // מזהה מפקח (PK)
+  firstName     String   // שם פרטי
+  lastName      String   // שם משפחה
+  email         String   // כתובת מייל
+  phoneNumber   String   // טלפון
+  inspectorType InspectorType      // סוג מפקח 
+  region        String   // אזור אחריות
+  isActive      Boolean  // פעיל
+  createdAt     DateTime @default(now()) // תאריך יצירה
+  updatedAt     DateTime @updatedAt      // תאריך עדכון
+  orders Orders[] // קשר לצווי בטיחות
+}
+
+enum InspectorType{
+  Chief // ראשי
+  Regional // אזורי
 }
