@@ -7,19 +7,7 @@ function InspectionPage() {
   // The ID of the open inspection popup
   const [openInspectionId, setOpenInspectionId] = useState(0);
   // Data to show
-  const [inspections, setInspections] = useState([
-    { id: 1, name: "report1", type: 1, date: "", inspector: "avi", status: 0 },
-    {
-      id: 2,
-      name: "report2",
-      type: 1,
-      date: "",
-      inspector: "itzik",
-      status: 1,
-    },
-    { id: 3, name: "report3", type: 2, date: "", inspector: "igal", status: 2 },
-    { id: 4, name: "report3", type: 3, date: "", inspector: "igal", status: 3 },
-  ]);
+  const [inspections, setInspections] = useState([]);
   const { inspector, logout } = useAuth();
   const {
     register,

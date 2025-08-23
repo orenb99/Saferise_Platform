@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body, query, validationResult } = require("express-validator");
 const xss = require("xss");
 
 // Sanitize input to prevent XSS
@@ -76,8 +76,22 @@ const validateSignin = [
   checkValidation,
 ];
 
+const validateSearchReviews = [
+  query("query")
+    .optional()
+    .matches(/^[a-zA-Z0-9\s- ]{,100}$/)
+    .withMessage("Invalid search query"),
+  // Change later for address query
+  query("region").optional().isLength({ max: 100 }),
+  query("toDate").optional().isISO8601().toDate(),
+  query("fromDate").optional().isISO8601().toDate(),
+  // Change later to match desired status values
+  query("status").optional().isArray(),
+  checkValidation,
+];
 module.exports = {
   sanitizeInput,
   validateSignup,
   validateSignin,
+  validateSearchReviews,
 };

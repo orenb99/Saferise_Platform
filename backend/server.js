@@ -79,7 +79,7 @@ app.get("/health", (req, res) => {
 
 // Routes
 app.use("/api/auth", authLimiter, authRoutes);
-
+app.use("/api/reviews", require("./routes/review"));
 // Handle 404
 app.use("*", (req, res) => {
   res.status(404).json({

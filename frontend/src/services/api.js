@@ -68,6 +68,20 @@ export const authAPI = {
   },
 };
 
+// Export the review API
+export const reviewAPI = {
+  searchReviews: async (params) => {
+    let queryString
+    try {
+      const response = await api.get("/reviews/search");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
+};
+
+
 // Utility functions for local storage
 export const tokenStorage = {
   set: (token) => {
