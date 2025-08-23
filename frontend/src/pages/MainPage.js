@@ -16,27 +16,23 @@ const MainPage = () => {
     );
   }
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case "Director":
+  const getRoleIcon = (type) => {
+    switch (type) {
+      case "Chief":
         return "👑";
-      case "Supervisor":
-        return "🔧";
-      case "Employee":
+      case "Regional":
         return "👤";
       default:
         return "👤";
     }
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case "Director":
+  const getRoleColor = (type) => {
+    switch (type) {
+      case "Chief":
         return "#f59e0b";
-      case "Supervisor":
+      case "Regional":
         return "#3b82f6";
-      case "Employee":
-        return "#10b981";
       default:
         return "#6b7280";
     }
@@ -45,7 +41,6 @@ const MainPage = () => {
   return (
     <div className="main-container">
       <Header logout={logout} />
-
       <main className="main-content">
         <div className="welcome-card">
           <h1 className="welcome-title">
@@ -80,19 +75,19 @@ const MainPage = () => {
               <span>{inspector.email}</span>
             </div>
 
-            {/* <div className="user-detail">
+            <div className="user-detail">
               <span>
-                <strong>{getRoleIcon(user.role)} Role:</strong>
+                <strong>{getRoleIcon(inspector.inspectorType)} Role:</strong>
               </span>
               <span
                 style={{
-                  color: getRoleColor(user.role),
+                  color: getRoleColor(inspector.inspectorType),
                   fontWeight: "bold",
                 }}
               >
-                {user.role}
+                {inspector.inspectorType}
               </span>
-            </div> */}
+            </div>
           </div>
 
           <div

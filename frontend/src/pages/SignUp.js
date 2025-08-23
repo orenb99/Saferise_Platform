@@ -116,6 +116,7 @@ const SignUp = () => {
               </div>
             )}
           </div>
+          {/* add inspectorType */}
           <div className="form-group">
             <label htmlFor="phoneNumber" className="form-label">
               Phone Number
