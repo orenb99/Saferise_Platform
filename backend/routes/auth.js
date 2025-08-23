@@ -100,7 +100,7 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(inspector.id);
+    const token = generateToken(inspector.inspectorId);
 
     res.json({
       message: "Sign in successful",

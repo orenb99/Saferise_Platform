@@ -24,7 +24,6 @@ const verifyToken = async (req, res, next) => {
     if (!inspector) {
       return res.status(403).json({ error: "Invalid token. inspector not found." });
     }
-
     req.inspector = inspector;
     next();
   } catch (error) {
