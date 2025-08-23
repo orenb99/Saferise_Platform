@@ -10,22 +10,25 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-model User {
-  id String   @id @db.VarChar(9)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  fullName  String
-  email     String   @unique
-  role      Role
-  password  String   // will be hashed before insert
+// Inspector Entity - מפקח (מוסק מהאפיון)
+model Inspector {
+  inspectorId   String   @id @db.VarChar(9)      // מזהה מפקח (PK)
+  fullName      String   // שם מלא
+  email         String   @unique// כתובת מייל
+  phoneNumber   String   @unique @db.VarChar(10)         // טלפון
+  password      String   // סיסמה
+  inspectorType InspectorType      // סוג מפקח 
+  region        String   // אזור אחריות
+  isActive      Boolean @default(true)  // פעיל
+  createdAt     DateTime @default(now()) // תאריך יצירה
+  updatedAt     DateTime @updatedAt      // תאריך עדכון
+  orders Orders[] // קשר לצווי בטיחות
+}
+enum InspectorType{
+  Chief // ראשי
+  Regional // אזורי
 }
 
-enum Role {
-  Employee  // עובד
-  Supervisor  // מפקח
-  Director  // מנהל
-}
 
 model Product {
   productId String @id // מזהה מוצר
@@ -307,22 +310,3 @@ enum OrderType{
   Approve // אישור תקינות
 }
 
-// Inspector Entity - מפקח (מוסק מהאפיון)
-model Inspector {
-  inspectorId   String   @id      // מזהה מפקח (PK)
-  firstName     String   // שם פרטי
-  lastName      String   // שם משפחה
-  email         String   // כתובת מייל
-  phoneNumber   String   // טלפון
-  inspectorType InspectorType      // סוג מפקח 
-  region        String   // אזור אחריות
-  isActive      Boolean  // פעיל
-  createdAt     DateTime @default(now()) // תאריך יצירה
-  updatedAt     DateTime @updatedAt      // תאריך עדכון
-  orders Orders[] // קשר לצווי בטיחות
-}
-
-enum InspectorType{
-  Chief // ראשי
-  Regional // אזורי
-}

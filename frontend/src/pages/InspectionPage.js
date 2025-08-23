@@ -20,7 +20,7 @@ function InspectionPage() {
     { id: 3, name: "report3", type: 2, date: "", inspector: "igal", status: 2 },
     { id: 4, name: "report3", type: 3, date: "", inspector: "igal", status: 3 },
   ]);
-  const { user, logout } = useAuth();
+  const { inspector, logout } = useAuth();
   const {
     register,
     handleSubmit,
@@ -31,7 +31,7 @@ function InspectionPage() {
     // setInspections(data);
   };
 
-  if (!user) {
+  if (!inspector) {
     return (
       <div className="container">
         <div className="loading">Loading alerts</div>

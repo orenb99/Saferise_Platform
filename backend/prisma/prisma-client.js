@@ -1,20 +1,20 @@
-const { PrismaClient } = require("@prisma/client");
-const validateFields = require("../models/User");
+const { PrismaClient, Prisma } = require("@prisma/client");
+const validateFields = require("../models/Inspector");
 const bcrypt = require("bcryptjs");
 // Custom schema functions
 const prisma_base = new PrismaClient();
 
 // Middlewares
 prisma_base.$use(async (params, next) => {
-  if (params.model === "User") {
+  if (params.model === "Inspector") {
     if (params.action === "create" || params.action === "update") {
-      const userData = params.args.data;
+      const inspectorData = params.args.data;
       // Validate fields before saving
-      validateFields(userData);
-      if (userData.password) {
+      validateFields(inspectorData);
+      if (inspectorData.password) {
         // Hash password before saving
         const salt = await bcrypt.genSalt(12);
-        userData.password = await bcrypt.hash(userData.password, salt);
+        inspectorData.password = await bcrypt.hash(inspectorData.password, salt);
       }
     }
   }
@@ -23,7 +23,7 @@ prisma_base.$use(async (params, next) => {
 
 const prisma = prisma_base.$extends({
   model: {
-    user: {
+    inspector: {
       // Compare password method
       async comparePassword(candidatePassword, encryptedPassword) {
         return await bcrypt.compare(candidatePassword, encryptedPassword);

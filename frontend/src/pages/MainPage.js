@@ -6,9 +6,9 @@ import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
   let navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { inspector, logout } = useAuth();
 
-  if (!user) {
+  if (!inspector) {
     return (
       <div className="container">
         <div className="loading">Loading user information...</div>
@@ -63,24 +63,24 @@ const MainPage = () => {
               <span>
                 <strong>👤 Full Name:</strong>
               </span>
-              <span>{user.fullName}</span>
+              <span>{inspector.fullName}</span>
             </div>
 
             <div className="user-detail">
               <span>
                 <strong>🆔 Israeli ID:</strong>
               </span>
-              <span>{user.id}</span>
+              <span>{inspector.inspectorId}</span>
             </div>
 
             <div className="user-detail">
               <span>
                 <strong>📧 Email:</strong>
               </span>
-              <span>{user.email}</span>
+              <span>{inspector.email}</span>
             </div>
 
-            <div className="user-detail">
+            {/* <div className="user-detail">
               <span>
                 <strong>{getRoleIcon(user.role)} Role:</strong>
               </span>
@@ -92,7 +92,7 @@ const MainPage = () => {
               >
                 {user.role}
               </span>
-            </div>
+            </div> */}
           </div>
 
           <div

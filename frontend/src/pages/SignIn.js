@@ -62,16 +62,16 @@ const SignIn = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="id" className="form-label">
+            <label htmlFor="inspectorId" className="form-label">
               Israeli ID
             </label>
             <input
-              id="id"
+              id="inspectorId"
               type="text"
               className={`form-input ${errors.id ? "error" : ""}`}
               placeholder="Enter your 9-digit Israeli ID"
               maxLength={9}
-              {...register("id", {
+              {...register("inspectorId", {
                 required: "Israeli ID is required",
                 pattern: {
                   value: /^\d{9}$/,
@@ -79,7 +79,7 @@ const SignIn = () => {
                 },
               })}
             />
-            {errors.id && (
+            {errors.inspectorId && (
               <div className="error-message">
                 <AlertCircle size={16} />
                 {errors.id.message}

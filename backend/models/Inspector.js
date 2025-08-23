@@ -1,3 +1,12 @@
+// Validate region is a string (change later)
+const validateRegion = (region) => {
+  return region.match(/^[a-z ]{3,}$/) !== null;
+};
+// Validate Israeli phone number format
+const validatePhoneNumber = (number) => {
+  return number.match(/^05\d[- ]?\d{3}[- ]?\d{4}$/) !== null;
+};
+
 // Israeli ID validation function
 const validateIsraeliID = (id) => {
   // Validate a 9 digit number
@@ -38,7 +47,6 @@ function validatePassword(password) {
 // Validate all fields and trim
 function validateFields(user) {
   let errs = [];
-
   if (user.email) {
     user.email = user.email.trim();
     if (!validateEmail(user.email)) errs.push("Please enter a valid email!");
@@ -50,6 +58,15 @@ function validateFields(user) {
   if (user.password && !validatePassword(user.password)) errs.push("Please enter a valid password");
   if (user.id && !validateIsraeliID(user.id)) errs.push("Please enter a valid id");
 
+  if (user.region && !validateRegion(user.region)) {
+    errs.push("Region isn't valid");
+  }
+
+  if (user.phoneNumber) {
+    if (!validatePhoneNumber(user.phoneNumber))
+      errs.push("Please enter a valid Israeli phone number!");
+    user.phoneNumber = user.phoneNumber.replace(/[- ]/g, "");
+  }
   if (errs.length > 0) {
     const err = new Error("Validation failed");
     err.name = "ValidationError";

@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('Employee', 'Supervisor', 'Director');
+CREATE TYPE "InspectorType" AS ENUM ('Chief', 'Regional');
 
 -- CreateEnum
 CREATE TYPE "ProductFamily" AS ENUM ('Elevator', 'Lift');
@@ -43,20 +43,20 @@ CREATE TYPE "AssemblyStatus" AS ENUM ('OK', 'NotOk', 'NotChecked');
 -- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('Disable', 'Fix', 'Approve');
 
--- CreateEnum
-CREATE TYPE "InspectorType" AS ENUM ('Chief', 'Regional');
-
 -- CreateTable
-CREATE TABLE "User" (
-    "id" VARCHAR(9) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+CREATE TABLE "Inspector" (
+    "inspectorId" VARCHAR(9) NOT NULL,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
+    "phoneNumber" VARCHAR(10) NOT NULL,
     "password" TEXT NOT NULL,
+    "inspectorType" "InspectorType" NOT NULL,
+    "region" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Inspector_pkey" PRIMARY KEY ("inspectorId")
 );
 
 -- CreateTable
@@ -258,24 +258,11 @@ CREATE TABLE "Orders" (
     CONSTRAINT "Orders_pkey" PRIMARY KEY ("orderId")
 );
 
--- CreateTable
-CREATE TABLE "Inspector" (
-    "inspectorId" TEXT NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "phoneNumber" TEXT NOT NULL,
-    "inspectorType" "InspectorType" NOT NULL,
-    "region" TEXT NOT NULL,
-    "isActive" BOOLEAN NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Inspector_pkey" PRIMARY KEY ("inspectorId")
-);
+-- CreateIndex
+CREATE UNIQUE INDEX "Inspector_email_key" ON "Inspector"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "Inspector_phoneNumber_key" ON "Inspector"("phoneNumber");
 
 -- AddForeignKey
 ALTER TABLE "Site" ADD CONSTRAINT "Site_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("addressId") ON DELETE RESTRICT ON UPDATE CASCADE;

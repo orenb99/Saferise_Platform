@@ -33,15 +33,15 @@ const validateSignup = [
 
   body("email").isEmail().withMessage("Please enter a valid email address").normalizeEmail(),
 
-  body("id")
+  body("inspectorId")
     .isLength({ min: 9, max: 9 })
     .withMessage("ID must be exactly 9 digits")
     .isNumeric()
     .withMessage("ID must contain only numbers"),
 
-  body("role")
-    .isIn(["Employee", "Supervisor", "Director"])
-    .withMessage("Role must be Employee, Supervisor, or Director"),
+  body("phoneNumber")
+    .matches(/^05\d[- ]?\d{3}[- ]?\d{4}$/)
+    .withMessage("Phone number must be a valid Israeli mobile number"),
 
   body("password")
     .isLength({ min: 8 })
@@ -50,8 +50,11 @@ const validateSignup = [
     .withMessage(
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     ),
-
+  body("region")
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Region must be between 3 and 100 characters"),
   checkValidation,
+  body("inspectorType").isBoolean().withMessage("Type must be a boolean"),
 ];
 
 // Validation rules for signin
@@ -62,7 +65,7 @@ const validateSignin = [
     .isLength({ max: 100 })
     .withMessage("Full name cannot exceed 100 characters"),
 
-  body("id")
+  body("inspectorId")
     .isLength({ min: 9, max: 9 })
     .withMessage("ID must be exactly 9 digits")
     .isNumeric()

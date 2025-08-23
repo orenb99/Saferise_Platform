@@ -42,6 +42,7 @@ const SignUp = () => {
 
   const onSubmit = async (data) => {
     try {
+      data.inspectorType = false;
       await signUp(data);
       navigate("/main");
     } catch (error) {
@@ -115,31 +116,55 @@ const SignUp = () => {
               </div>
             )}
           </div>
-
           <div className="form-group">
-            <label htmlFor="id" className="form-label">
+            <label htmlFor="phoneNumber" className="form-label">
+              Phone Number
+            </label>
+            <input
+              id="phoneNumber"
+              type="text"
+              className={`form-input ${errors.phoneNumber ? "error" : ""}`}
+              placeholder="Enter your 10-digit Phone Number"
+              maxLength={12}
+              {...register("phoneNumber", {
+                required: "Phone Number is required",
+                pattern: {
+                  value: /^05\d[- ]?\d{3}[- ]?\d{4}$/,
+                  message: "Must be a valid Israeli phone number",
+                },
+              })}
+            />
+            {errors.phoneNumber && (
+              <div className="error-message">
+                <AlertCircle size={16} />
+                {errors.phoneNumber.message}
+              </div>
+            )}
+          </div>
+          <div className="form-group">
+            <label htmlFor="inspectorId" className="form-label">
               Israeli ID
             </label>
             <input
-              id="id"
+              id="inspectorId"
               type="text"
-              className={`form-input ${errors.id ? "error" : ""}`}
+              className={`form-input ${errors.inspectorId ? "error" : ""}`}
               placeholder="Enter your 9-digit Israeli ID"
               maxLength={9}
-              {...register("id", {
+              {...register("inspectorId", {
                 required: "Israeli ID is required",
                 validate: validateIsraeliID,
               })}
             />
-            {errors.id && (
+            {errors.inspectorId && (
               <div className="error-message">
                 <AlertCircle size={16} />
-                {errors.id.message}
+                {errors.inspectorId.message}
               </div>
             )}
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="role" className="form-label">
               Role
             </label>
@@ -161,7 +186,7 @@ const SignUp = () => {
                 {errors.role.message}
               </div>
             )}
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label htmlFor="password" className="form-label">
@@ -182,6 +207,34 @@ const SignUp = () => {
                   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
                   message:
                     "Password must contain uppercase, lowercase, number, and special character",
+                },
+              })}
+            />
+            {errors.password && (
+              <div className="error-message">
+                <AlertCircle size={16} />
+                {errors.password.message}
+              </div>
+            )}
+          </div>
+          <div className="form-group">
+            <label htmlFor="region" className="form-label">
+              Region
+            </label>
+            <input
+              id="region"
+              type="text"
+              className={`form-input ${errors.region ? "error" : ""}`}
+              placeholder="Enter your region"
+              {...register("region", {
+                required: "Region is required",
+                minLength: {
+                  value: 3,
+                  message: "Region must be at least 3 characters",
+                },
+                pattern: {
+                  value: /^[a-z ]{3,100}$/,
+                  message: "Region must contain only lowercase letters and spaces",
                 },
               })}
             />

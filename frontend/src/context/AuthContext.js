@@ -13,13 +13,13 @@ const authReducer = (state, action) => {
     case "SET_USER":
       return {
         ...state,
-        user: action.payload,
+        inspector: action.payload,
         isAuthenticated: !!action.payload,
         loading: false,
       };
     case "LOGOUT":
       return {
-        user: null,
+        inspector: null,
         isAuthenticated: false,
         loading: false,
       };
@@ -31,7 +31,7 @@ const authReducer = (state, action) => {
 };
 
 const initialState = {
-  user: null,
+  inspector: null,
   isAuthenticated: false,
   loading: true,
   error: null,
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         try {
           // Verify token is still valid
           const response = await authAPI.getCurrentUser();
-          dispatch({ type: "SET_USER", payload: response.user });
+          dispatch({ type: "SET_USER", payload: response.inspector });
         } catch (error) {
           // Token is invalid, clear storage
           tokenStorage.remove();
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
       // Store token and user data
       tokenStorage.set(response.token);
 
-      dispatch({ type: "SET_USER", payload: response.user });
+      dispatch({ type: "SET_USER", payload: response.inspector });
       toast.success("Account created successfully!");
 
       return response;
@@ -90,8 +90,8 @@ export const AuthProvider = ({ children }) => {
       // Store token and user data
       tokenStorage.set(response.token);
 
-      dispatch({ type: "SET_USER", payload: response.user });
-      toast.success(`Welcome back, ${response.user.fullName}!`);
+      dispatch({ type: "SET_USER", payload: response.inspector });
+      toast.success(`Welcome back, ${response.inspector.fullName}!`);
 
       return response;
     } catch (error) {
