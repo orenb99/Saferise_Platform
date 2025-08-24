@@ -1,4 +1,4 @@
-const { body, query, validationResult } = require("express-validator");
+const { body, query, param, validationResult } = require("express-validator");
 const xss = require("xss");
 
 // Sanitize input to prevent XSS
@@ -78,15 +78,28 @@ const validateSignin = [
 
 const validateSearchReviews = [
   query("query")
-    .optional()
+    .optional({ nullable: true, checkFalsy: true })
     .matches(/^[a-zA-Z0-9\s\-]{0,100}$/)
     .withMessage("Invalid search query"),
   // Change later for address query
   query("region").optional().isLength({ max: 100 }),
-  query("toDate").optional().isISO8601().toDate(),
-  query("fromDate").optional().isISO8601().toDate(),
+  query("toDate")
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(/^\d{4}-\d{2}-\d{2}$/)
+    .withMessage("Invalid to date format"),
+  query("fromDate")
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(/^\d{4}-\d{2}-\d{2}$/)
+    .withMessage("Invalid from date format"),
   // Change later to match desired status values
-  query("status").optional().isArray(),
+  query("status").optional({ nullable: true, checkFalsy: true }).isArray(),
+  checkValidation,
+];
+const validateReviewId = [
+  // Change later to match desired ID format
+  param("reviewId")
+    .matches(/^[a-zA-Z0-9]+$/)
+    .withMessage("Invalid review ID"),
   checkValidation,
 ];
 module.exports = {
@@ -94,4 +107,5 @@ module.exports = {
   validateSignup,
   validateSignin,
   validateSearchReviews,
+  validateReviewId,
 };

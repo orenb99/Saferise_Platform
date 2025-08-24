@@ -1,7 +1,11 @@
 const express = require("express");
 const prisma = require("../prisma/prisma-client");
 const { verifyToken } = require("../middleware/auth");
-const { sanitizeInput, validateSearchReviews } = require("../middleware/validation");
+const {
+  sanitizeInput,
+  validateSearchReviews,
+  validateReviewId,
+} = require("../middleware/validation");
 
 const router = express.Router();
 router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
@@ -11,30 +15,37 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
     // Build dynamic query based on provided parameters
     if (query) {
       searchQuery.OR = [
-        { reviewId: { contains: query, mode: "insensitive" } }, // Search in reviewId
-        { reviewerId: { contains: query, mode: "insensitive" } }, // Search in reviewerId
-        { reviewer: { fullName: { contains: query, mode: "insensitive" } } }, // Search in reviewer's fullName
-        { assetId: { contains: query, mode: "insensitive" } }, // Search in assetId
+        { reviewId: { contains: query, mode: "insensitive" } },
+        { reviewerId: { contains: query, mode: "insensitive" } },
+        { reviewer: { fullName: { contains: query, mode: "insensitive" } } },
+        { assetId: { contains: query, mode: "insensitive" } },
         {
-          asset: (OR = [
-            { name: { contains: query, mode: "insensitive" } }, // Search in asset's name
-            { siteId: { contains: query, mode: "insensitive" } }, // Search in asset's siteId
-            { productId: { contains: query, mode: "insensitive" } }, // Search in asset's productId
-            { assetOwner: { fullName: { contains: query, mode: "insensitive" } } }, // Search in asset's owner's fullName
-          ]),
-        }, // Search in asset's siteId
+          asset: {
+            OR: [
+              { name: { contains: query, mode: "insensitive" } },
+              { siteId: { contains: query, mode: "insensitive" } },
+              { productId: { contains: query, mode: "insensitive" } },
+              { assetOwner: { name: { contains: query, mode: "insensitive" } } },
+            ],
+          },
+        },
       ];
     }
     if (toDate && fromDate) {
-      if (new Date(toDate) < new Date(fromDate)) {
-        return res.status(400).json({ error: "'toDate' cannot be earlier than 'fromDate'" });
+      from = new Date(fromDate);
+      to = new Date(toDate);
+      if (from.toString() === "Invalid Date" || to.toString() === "Invalid Date") {
+        return res.status(400).json({ error: "Invalid date format" });
       }
-      searchQuery.installationDate = {};
+      if (to < from) {
+        return res.status(400).json({ error: "to date cannot be earlier than from date" });
+      }
+      searchQuery.reviewDate = {};
       if (toDate) {
-        searchQuery.installationDate.lte = new Date(toDate);
+        searchQuery.reviewDate.lte = new Date(toDate);
       }
       if (fromDate) {
-        searchQuery.installationDate.gte = new Date(fromDate);
+        searchQuery.reviewDate.gte = new Date(fromDate);
       }
     }
     if (region) {
@@ -63,6 +74,40 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error("Search error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const review = await prisma.review.findUnique({
+      where: { reviewId },
+      include: {
+        createdAt: false,
+        updatedAt: false,
+        reviewer: {
+          select: {
+            accountId: true,
+            fullName: true,
+          },
+        },
+        asset: {
+          include: {
+            reviews: {
+              where: { NOT: { reviewId } },
+              select: { reviewId: true, reviewDate: true },
+              orderBy: { reviewDate: "desc" },
+            },
+          },
+        },
+      },
+    });
+    if (!review) {
+      return res.status(404).json({ error: "Review not found" });
+    }
+    return res.status(200).json({ message: "Review retrieved successfully", data: review });
+  } catch (error) {
+    console.error("Get review error:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });

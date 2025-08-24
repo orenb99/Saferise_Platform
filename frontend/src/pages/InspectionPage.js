@@ -20,6 +20,7 @@ function InspectionPage() {
 
   // Search for inspections
   const searchQuery = async (query) => {
+    console.log("Searching with query:", query);
     try {
       const res = await reviewAPI.searchReviews(query);
       setInspections(res.data);
@@ -86,19 +87,17 @@ function InspectionPage() {
 
   // Map the data
   const mapInspections = () => {
-    return (
+    return inspections.map((inspection) => (
       <tr>
-        {inspections.map((inspection) => (
-          <td
-            onClick={() => {
-              setOpenInspectionId(inspection.reviewId);
-            }}
-          >
-            {inspection.reviewId}
-          </td>
-        ))}
+        <td
+          onClick={() => {
+            setOpenInspectionId(inspection.reviewId);
+          }}
+        >
+          {inspection.reviewId}
+        </td>
       </tr>
-    );
+    ));
   };
   return (
     <div className="main-container">
@@ -125,14 +124,14 @@ function InspectionPage() {
                   id="from-date"
                   type="date"
                   className={`form-input`}
-                  {...register("from-date")}
+                  {...register("fromDate")}
                 />
               </div>
               <div className="form-group">
                 <label htmlFor="to-date" className="form-label">
                   to
                 </label>
-                <input id="to-date" type="date" className={`form-input`} {...register("to-date")} />
+                <input id="to-date" type="date" className={`form-input`} {...register("toDate")} />
               </div>
             </div>
             <div className="form-group">

@@ -91,6 +91,14 @@ export const reviewAPI = {
       throw error.response?.data || { error: "Network error occurred" };
     }
   },
+  getReviewById: async (id) => {
+    try {
+      const response = await api.get(`/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
 };
 
 // Utility functions for local storage

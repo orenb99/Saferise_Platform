@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-
+import { reviewAPI } from "../services/api";
+import toast from "react-hot-toast";
 function InspectionPopUp({ id, setId }) {
-  const [inspection, setInspection] = useState({
-    elevatorId: 3021354,
-    details: "details",
-    deficiencies: "deficiencies",
-    previous: [10120, 2450, 7503, 12034, 12035],
-  });
+  const [inspection, setInspection] = useState(null);
+
+  useEffect(() => {
+    const fetchInspection = async () => {
+      try {
+        const res = await reviewAPI.getReviewById(id);
+        console.log(res);
+        // setInspection(res);
+      } catch (error) {
+        const message = error.error || "An error occurred";
+        toast.error(message);
+      }
+    };
+    if (id) {
+      fetchInspection();
+    }
+  }, [id]);
 
   const approveInspection = () => {
     alert("Inspection approved");
@@ -32,15 +44,17 @@ function InspectionPopUp({ id, setId }) {
 
   // If still loading
   if (!inspection) {
-    <div className="popup-overlay">
-      <div className="popup" onClick={(e) => e.stopPropagation()}>
-        <h2>Inspection ID: {id}</h2>
-        <p>loading...</p>
-        <button onClick={() => setId(0)} className="popup-close">
-          Close
-        </button>{" "}
+    return (
+      <div className="popup-overlay">
+        <div className="popup" onClick={(e) => e.stopPropagation()}>
+          <h2>Inspection ID: {id}</h2>
+          <p>loading...</p>
+          <button onClick={() => setId(0)} className="popup-close">
+            Close
+          </button>{" "}
+        </div>
       </div>
-    </div>;
+    );
   }
   return (
     <div className="popup-overlay">
@@ -49,7 +63,8 @@ function InspectionPopUp({ id, setId }) {
           <X size={22} strokeWidth={3} />
         </button>
         <h2>Inspection #{id}</h2>
-        <h3>Elevator #{inspection.elevatorId}</h3>
+        <h3>Elevator #{inspection.assetId}</h3>
+        <h3>{inspection.reviewDate}</h3>
         <h3>Details</h3>
         <div>{inspection.details}</div>
         <h3>Deficiencies</h3>
