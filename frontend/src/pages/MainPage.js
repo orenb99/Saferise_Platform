@@ -1,7 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { LogOut, User, Shield, Mail, IdCard } from "lucide-react";
-import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
@@ -40,7 +39,6 @@ const MainPage = () => {
 
   return (
     <div className="main-container">
-      <Header logout={logout} />
       <main className="main-content">
         <div className="welcome-card">
           <h1 className="welcome-title">

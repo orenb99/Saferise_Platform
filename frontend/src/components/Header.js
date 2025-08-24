@@ -1,11 +1,11 @@
 import React from "react";
 import { LogOut, Bell } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
-function Header({ logout }) {
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+function Header() {
+  const { logout } = useAuth();
   let navigate = useNavigate();
-  const handleLogout = () => {
-    logout();
-  };
+
   return (
     <header className="header">
       <div
@@ -25,7 +25,7 @@ function Header({ logout }) {
         >
           <Bell size={18} />
         </button>
-        <button onClick={handleLogout} className="logout-button header-button">
+        <button onClick={logout} className="logout-button header-button">
           <LogOut size={18} style={{ marginRight: "8px" }} />
         </button>
       </div>

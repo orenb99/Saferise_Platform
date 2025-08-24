@@ -1,6 +1,7 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Header from "./Header";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -8,14 +9,19 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="container">
-        <div className="loading">
-          Loading...
-        </div>
+        <div className="loading">Loading...</div>
       </div>
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/signin" replace />;
+  return isAuthenticated ? (
+    <>
+      <Header />
+      {children}
+    </>
+  ) : (
+    <Navigate to="/signin" replace />
+  );
 };
 
 export default ProtectedRoute;

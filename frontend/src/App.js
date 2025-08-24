@@ -9,6 +9,7 @@ import MainPage from "./pages/MainPage";
 import AlertsPage from "./pages/AlertsPage";
 import GuestRoute from "./components/GuestRoute";
 import InspectionPage from "./pages/InspectionPage";
+import Header from "./components/Header";
 
 function App() {
   return (

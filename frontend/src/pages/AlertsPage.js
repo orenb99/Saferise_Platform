@@ -1,6 +1,5 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import Header from "../components/Header";
 
 function AlertsPage() {
   const { inspector, logout } = useAuth();
@@ -18,19 +17,9 @@ function AlertsPage() {
     );
   }
   if (!data) {
-    return (
-      <div className="main-container">
-        <Header logout={logout} />
-        loading...
-      </div>
-    );
+    return <div className="main-container">loading...</div>;
   }
-  return (
-    <div className="main-container">
-      <Header logout={logout} />
-      
-    </div>
-  );
+  return <div className="main-container"></div>;
 }
 
 export default AlertsPage;

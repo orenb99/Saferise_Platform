@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import Header from "../components/Header";
 import InspectionPopUp from "../components/InspectionPopUp";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
@@ -101,7 +100,6 @@ function InspectionPage() {
   };
   return (
     <div className="main-container">
-      <Header logout={logout} />
       {/* Floating button "+" to add reports */}
       <div className="inspection-container">
         <div className="form-container">
