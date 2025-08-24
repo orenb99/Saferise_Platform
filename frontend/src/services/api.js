@@ -68,19 +68,30 @@ export const authAPI = {
   },
 };
 
-// Export the review API
+function toQueryStringBrackets(obj) {
+  return Object.keys(obj)
+    .map((key) => {
+      const value = obj[key];
+      if (Array.isArray(value)) {
+        return value.map((v) => `${encodeURIComponent(key)}[]=${encodeURIComponent(v)}`).join("&");
+      }
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+    })
+    .join("&");
+}
+
+// review API
 export const reviewAPI = {
   searchReviews: async (params) => {
-    let queryString
+    let queryString = toQueryStringBrackets(params);
     try {
-      const response = await api.get("/reviews/search");
+      const response = await api.get("/reviews/search?" + queryString);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Network error occurred" };
     }
   },
 };
-
 
 // Utility functions for local storage
 export const tokenStorage = {

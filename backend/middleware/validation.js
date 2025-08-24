@@ -79,7 +79,7 @@ const validateSignin = [
 const validateSearchReviews = [
   query("query")
     .optional()
-    .matches(/^[a-zA-Z0-9\s- ]{,100}$/)
+    .matches(/^[a-zA-Z0-9\s\-]{0,100}$/)
     .withMessage("Invalid search query"),
   // Change later for address query
   query("region").optional().isLength({ max: 100 }),

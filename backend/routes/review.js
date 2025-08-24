@@ -11,12 +11,18 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
     // Build dynamic query based on provided parameters
     if (query) {
       searchQuery.OR = [
-        { reviewerId: { contains: query, mode: "insensitive" } },
-        { reviewId: { contains: query, mode: "insensitive" } },
-        { assetId: { contains: query, mode: "insensitive" } },
-        { asset: { siteId: { contains: query, mode: "insensitive" } } },
-        { productId: { contains: query, mode: "insensitive" } },
-        { assetOwnerId: { contains: query, mode: "insensitive" } },
+        { reviewId: { contains: query, mode: "insensitive" } }, // Search in reviewId
+        { reviewerId: { contains: query, mode: "insensitive" } }, // Search in reviewerId
+        { reviewer: { fullName: { contains: query, mode: "insensitive" } } }, // Search in reviewer's fullName
+        { assetId: { contains: query, mode: "insensitive" } }, // Search in assetId
+        {
+          asset: (OR = [
+            { name: { contains: query, mode: "insensitive" } }, // Search in asset's name
+            { siteId: { contains: query, mode: "insensitive" } }, // Search in asset's siteId
+            { productId: { contains: query, mode: "insensitive" } }, // Search in asset's productId
+            { assetOwner: { fullName: { contains: query, mode: "insensitive" } } }, // Search in asset's owner's fullName
+          ]),
+        }, // Search in asset's siteId
       ];
     }
     if (toDate && fromDate) {
@@ -40,9 +46,12 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
     const data = await prisma.review.findMany({
       where: searchQuery,
       include: {
-        inspector: {
+        createdAt: false,
+        updatedAt: false,
+        reviewer: {
           select: {
-            inspectorId: true,
+            accountId: true,
+            fullName: true,
           },
         },
         asset: true,

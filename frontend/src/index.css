@@ -78,21 +78,22 @@ code {
 }
 .form-container .form-row {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
   align-content: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   align-items: center;
-  width: min-content;
+  flex-direction: row;
+  width: 100%;
+  flex-wrap: wrap;
 }
 .form-group .form-row .checkbox {
-  margin-right: 10px;
+  margin-right: 15px;
+  margin-top: 5px;
   display: flex;
   justify-content: center;
   align-content: center;
   align-items: center;
 }
-.form-row .checkbox .form-input {
+.form-group .form-row .checkbox input {
   margin-right: 3px;
 }
 .form-row .checkbox .form-label {

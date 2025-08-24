@@ -193,8 +193,7 @@ enum ShaftDoorType {
 // Account_Reviewer Entity - בודק מוסמך
 model AccountReviewer {
   accountId           String   @id      // מזהה חשבון (PK)
-  firstName           String   // שם פרטי
-  lastName            String   // שם משפחה
+  fullName            String   // שם מלא
   phoneNumber         String   // מספר טלפון
   email               String   // כתובת מייל
   identityType        Int      // סוג זיהוי (CHECK LATER)

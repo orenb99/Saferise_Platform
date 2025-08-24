@@ -1,23 +1,40 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { set, useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 import Header from "../components/Header";
 import InspectionPopUp from "../components/InspectionPopUp";
+import { reviewAPI } from "../services/api";
+import toast from "react-hot-toast";
 function InspectionPage() {
   // The ID of the open inspection popup
   const [openInspectionId, setOpenInspectionId] = useState(0);
   // Data to show
   const [inspections, setInspections] = useState([]);
   const { inspector, logout } = useAuth();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    // setInspections(data);
+  // Search for inspections
+  const searchQuery = async (query) => {
+    try {
+      const res = await reviewAPI.searchReviews(query);
+      setInspections(res.data);
+    } catch (error) {
+      const message = error.error || "An error occurred";
+      toast.error(message);
+    }
   };
+  const onSubmit = async (query) => {
+    await searchQuery(query);
+  };
+  useEffect(() => {
+    // Initial load of inspections
+    searchQuery({});
+  }, []);
 
   if (!inspector) {
     return (
@@ -38,38 +55,50 @@ function InspectionPage() {
   };
   // List the status checkboxes
   const showStatuses = () => {
-    const statuses = ["ok", "minor deficiency", "major deficiency", "shutdown"];
+    const statuses = ["Operatable", "Shutdown"];
     return statuses.map((value, index) => (
-      <div className="checkbox">
-        <input
-          id={value}
-          value={index}
-          type="checkbox"
-          className={"form-input"}
-          {...register("status")}
-        />
+      <div className="checkbox" key={"cs" + index}>
+        <input id={value} value={value} type="checkbox" {...register("decision")} />
         <label htmlFor={value} className="form-label">
-          {capitalize(value)}
+          {value}
         </label>
       </div>
     ));
   };
+  const showReasons = () => {
+    const reasons = [
+      "Routine Check",
+      "First Check",
+      "Post Fix Check",
+      "Post Recall",
+      "Elevation",
+      "Drastic Change",
+    ];
+    return reasons.map((value, index) => (
+      <div className="checkbox" key={"cr" + index}>
+        <input id={value} value={value.replace(/ /g, "")} type="checkbox" {...register("reason")} />
+        <label htmlFor={value} className="form-label">
+          {value}
+        </label>
+      </div>
+    ));
+  };
+
   // Map the data
   const mapInspections = () => {
-    return inspections.map((item) => (
-      <tr className={`inspection-entity type${item.type}`}>
-        {Object.values(item).map((value) => (
-          <td>{value}</td>
+    return (
+      <tr>
+        {inspections.map((inspection) => (
+          <td
+            onClick={() => {
+              setOpenInspectionId(inspection.reviewId);
+            }}
+          >
+            {inspection.reviewId}
+          </td>
         ))}
-        <td
-          onClick={() => {
-            setOpenInspectionId(item.id);
-          }}
-        >
-          open
-        </td>
       </tr>
-    ));
+    );
   };
   return (
     <div className="main-container">
@@ -115,8 +144,12 @@ function InspectionPage() {
               </select>
             </div>
             <div className="form-group">
-              <div className="form-label">Status</div>
+              <div className="form-label">Decision</div>
               <div className="form-row">{showStatuses()}</div>
+            </div>
+            <div className="form-group">
+              <div className="form-label">Reason</div>
+              <div className="form-row">{showReasons()}</div>
             </div>
             <button type="submit" className="submit-button">
               Search

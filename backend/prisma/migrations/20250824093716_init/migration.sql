@@ -163,8 +163,7 @@ CREATE TABLE "Asset" (
 -- CreateTable
 CREATE TABLE "AccountReviewer" (
     "accountId" TEXT NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "identityType" INTEGER NOT NULL,
