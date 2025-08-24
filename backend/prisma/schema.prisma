@@ -280,7 +280,7 @@ model ReviewDefect {
   subject            String   // נושא במכלול
   subjectFinding     String @db.Text  // מזהה ממצא לפי נושא במכלול
   defectDescription  String @db.Text  // תיאור התקלה
-  severity           Int      // דרגת חומרה (CHEK LATER)
+  severity           Int      // דרגת חומרה (CHECK LATER)
   isResolved         Boolean  // טופל 
   resolvedDate       DateTime // תאריך טיפול
   createdAt          DateTime @default(now()) // תאריך יצירה
