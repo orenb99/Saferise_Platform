@@ -56,7 +56,7 @@ function InspectionPage() {
   };
   // List the status checkboxes
   const showStatuses = () => {
-    const statuses = ["Operatable", "Shutdown"];
+    const statuses = ["Operatable", "Disable"];
     return statuses.map((value, index) => (
       <div className="checkbox" key={"cs" + index}>
         <input id={value} value={value} type="checkbox" {...register("decision")} />

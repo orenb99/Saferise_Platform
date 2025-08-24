@@ -9,8 +9,8 @@ function InspectionPopUp({ id, setId }) {
     const fetchInspection = async () => {
       try {
         const res = await reviewAPI.getReviewById(id);
-        console.log(res);
-        // setInspection(res);
+        console.log(res.data);
+        setInspection(res.data);
       } catch (error) {
         const message = error.error || "An error occurred";
         toast.error(message);
@@ -64,16 +64,16 @@ function InspectionPopUp({ id, setId }) {
         </button>
         <h2>Inspection #{id}</h2>
         <h3>Elevator #{inspection.assetId}</h3>
-        <h3>{inspection.reviewDate}</h3>
+        <h3>{new Date(inspection.reviewDate).toLocaleDateString("en-GB")}</h3>
         <h3>Details</h3>
-        <div>{inspection.details}</div>
+        <div>{inspection.summary}</div>
         <h3>Deficiencies</h3>
-        <div>{inspection.deficiencies}</div>
+        {/* <div>{inspection.deficiencies}</div> */}
         <h3>Previous inspections</h3>
         {/* Change to another inspection */}
-        {inspection.previous.map((item, index) => (
-          <div onClick={() => setId(item)}>
-            {index + 1}. {item}
+        {inspection.asset.reviews.map((item, index) => (
+          <div onClick={() => setId(item.reviewId)}>
+            {index + 1}. {item.reviewId} - {new Date(item.reviewDate).toLocaleDateString("en-GB")}
           </div>
         ))}
         <div className="popup-actions">
