@@ -6,10 +6,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
-import AlertsPage from "./pages/AlertsPage";
+import OrdersPage from "./pages/OrdersPage";
 import GuestRoute from "./components/GuestRoute";
 import InspectionPage from "./pages/InspectionPage";
-import Header from "./components/Header";
 
 function App() {
   return (
@@ -69,10 +68,10 @@ function App() {
               }
             />
             <Route
-              path="/alerts"
+              path="/orders"
               element={
                 <ProtectedRoute>
-                  <AlertsPage />
+                  <OrdersPage />
                 </ProtectedRoute>
               }
             />

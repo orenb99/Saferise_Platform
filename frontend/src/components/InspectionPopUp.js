@@ -7,6 +7,7 @@ function InspectionPopUp({ id, setId }) {
 
   useEffect(() => {
     const fetchInspection = async () => {
+      setInspection(null); // Reset inspection while loading new one
       try {
         const res = await reviewAPI.getReviewById(id);
         console.log(res.data);
@@ -14,6 +15,7 @@ function InspectionPopUp({ id, setId }) {
       } catch (error) {
         const message = error.error || "An error occurred";
         toast.error(message);
+        setId(0); // Close popup on error
       }
     };
     if (id) {
@@ -72,7 +74,7 @@ function InspectionPopUp({ id, setId }) {
         <h3>Previous inspections</h3>
         {/* Change to another inspection */}
         {inspection.asset.reviews.map((item, index) => (
-          <div onClick={() => setId(item.reviewId)}>
+          <div onClick={() => setId(item.reviewId)} key={index}>
             {index + 1}. {item.reviewId} - {new Date(item.reviewDate).toLocaleDateString("en-GB")}
           </div>
         ))}

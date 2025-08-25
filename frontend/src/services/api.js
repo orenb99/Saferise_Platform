@@ -68,6 +68,7 @@ export const authAPI = {
   },
 };
 
+// Helper to convert params object to query string
 function toQueryStringBrackets(obj) {
   return Object.keys(obj)
     .map((key) => {
@@ -94,6 +95,26 @@ export const reviewAPI = {
   getReviewById: async (id) => {
     try {
       const response = await api.get(`/reviews/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
+};
+
+export const orderAPI = {
+  // No need to pass inspectorId, it's passed with the token
+  getAllOrdersByInspector: async () => {
+    try {
+      const response = await api.get(`/orders/all`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
+  getTopFiveOrders: async () => {
+    try {
+      const response = await api.get(`/orders/top`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Network error occurred" };

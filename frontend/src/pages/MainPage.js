@@ -1,12 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { LogOut, User, Shield, Mail, IdCard } from "lucide-react";
+import { MessageSquare, User, Shield, Mail, IdCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { orderAPI } from "../services/api";
+import toast from "react-hot-toast";
 
 const MainPage = () => {
   let navigate = useNavigate();
-  const { inspector, logout } = useAuth();
-
+  const { inspector } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [ordersCount, setOrdersCount] = useState(0);
+  useEffect(() => {
+    if (!inspector) return;
+    const fetchOrders = async () => {
+      try {
+        const response = await orderAPI.getTopFiveOrders();
+        console.log("DATA:", response.data);
+        setOrders(response.data.topFive);
+        setOrdersCount(response.data.count);
+      } catch (error) {
+        const message = error.error || "An error occurred";
+        toast.error(message);
+      }
+    };
+    fetchOrders();
+  }, [inspector]);
   if (!inspector) {
     return (
       <div className="container">
@@ -37,6 +55,31 @@ const MainPage = () => {
     }
   };
 
+  const showNotification = () => {
+    if (ordersCount > 0) {
+      return (
+        <span className="notification">
+          <div className="notification-inner">{ordersCount}</div>
+          <MessageSquare size={60} fill="red" color="black" strokeWidth="0.2px" />
+        </span>
+      );
+    }
+  };
+  const showOrders = () => {
+    console.log(orders);
+    if (!orders || orders.length === 0) {
+      return <div>No recent orders</div>;
+    }
+    return orders.map((order) => (
+      <div key={order.orderId} className="order-item">
+        <div>{order.orderId}</div>
+        <div>{order.reviewId}</div>
+        <div>{order.orderType}</div>
+        <div>{order.status}</div>
+        <div>{new Date(order.dueDate).toLocaleDateString("en-GB")}</div>
+      </div>
+    ));
+  };
   return (
     <div className="main-container">
       <main className="main-content">
@@ -109,14 +152,40 @@ const MainPage = () => {
             </p>
           </div>
         </div>
-        <div
-          className="inspection-card sub-card"
-          onClick={() => {
-            navigate("/inspections");
-          }}
-        >
-          <div className="welcome-title">
-            🔎 <span>Search for Inspections</span>
+        <div className="sub-cards-container">
+          {/* Inspection search page banner */}
+          <div
+            className="inspection-card sub-card "
+            onClick={() => {
+              navigate("/inspections");
+            }}
+          >
+            <div className="welcome-title">
+              🔎 <span>Search for Inspections</span>
+            </div>
+          </div>
+          {/* Orders page banner */}
+          <div className="notification-target">
+            <div
+              className="order-card sub-card"
+              onClick={() => {
+                navigate("/orders");
+              }}
+            >
+              {showNotification()}
+
+              <div className="welcome-title">
+                🚨 <span>View Your Orders</span>
+              </div>
+              <div
+                className="top-five-orders"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                {showOrders()}
+              </div>
+            </div>
           </div>
         </div>
       </main>

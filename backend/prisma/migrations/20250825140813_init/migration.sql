@@ -241,7 +241,7 @@ CREATE TABLE "ReviewDefect" (
 );
 
 -- CreateTable
-CREATE TABLE "Orders" (
+CREATE TABLE "Order" (
     "orderId" TEXT NOT NULL,
     "reviewId" TEXT NOT NULL,
     "inspectorId" TEXT NOT NULL,
@@ -254,7 +254,7 @@ CREATE TABLE "Orders" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Orders_pkey" PRIMARY KEY ("orderId")
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("orderId")
 );
 
 -- CreateIndex
@@ -294,7 +294,7 @@ ALTER TABLE "ReviewAssembly" ADD CONSTRAINT "ReviewAssembly_reviewId_fkey" FOREI
 ALTER TABLE "ReviewDefect" ADD CONSTRAINT "ReviewDefect_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Orders" ADD CONSTRAINT "Orders_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Orders" ADD CONSTRAINT "Orders_inspectorId_fkey" FOREIGN KEY ("inspectorId") REFERENCES "Inspector"("inspectorId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_inspectorId_fkey" FOREIGN KEY ("inspectorId") REFERENCES "Inspector"("inspectorId") ON DELETE RESTRICT ON UPDATE CASCADE;

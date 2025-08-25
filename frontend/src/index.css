@@ -198,7 +198,6 @@ code {
 }
 
 .main-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   flex-direction: column;
@@ -247,11 +246,17 @@ code {
 }
 
 .main-content {
-  flex: 1;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-evenly;
   padding: 40px;
+}
+.sub-cards-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 30px;
 }
 .sub-card {
   background: rgba(255, 255, 255, 0.95);
@@ -269,6 +274,33 @@ code {
 .sub-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+.notification-target {
+  position: relative; /* Required for absolute positioning */
+}
+
+.order-card .notification {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: -33px;
+  right: -36px;
+}
+
+.order-card .notification .notification-inner {
+  position: absolute;
+  width: 70%;
+  text-align: center;
+  padding-bottom: 10px;
+}
+.order-card .top-five-orders .order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 .sub-card .welcome-title {
   font-size: 1.7rem;

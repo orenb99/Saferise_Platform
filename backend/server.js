@@ -3,6 +3,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
+const reviewRoutes = require("./routes/review");
+const orderRoutes = require("./routes/order");
 const connectDB = require("./prisma/database");
 
 // Load environment variables
@@ -79,7 +81,9 @@ app.get("/health", (req, res) => {
 
 // Routes
 app.use("/api/auth", authLimiter, authRoutes);
-app.use("/api/reviews", require("./routes/review"));
+app.use("/api/reviews", reviewRoutes);
+app.use("/api/orders", orderRoutes);
+
 // Handle 404
 app.use("*", (req, res) => {
   res.status(404).json({

@@ -6,7 +6,6 @@ const AuthContext = createContext();
 
 // Auth reducer
 const authReducer = (state, action) => {
-  // console.log(state, action);
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };

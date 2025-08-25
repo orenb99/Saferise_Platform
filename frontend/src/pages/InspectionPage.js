@@ -9,7 +9,8 @@ function InspectionPage() {
   const [openInspectionId, setOpenInspectionId] = useState(0);
   // Data to show
   const [inspections, setInspections] = useState([]);
-  const { inspector, logout } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { inspector } = useAuth();
 
   const {
     register,
@@ -19,13 +20,15 @@ function InspectionPage() {
 
   // Search for inspections
   const searchQuery = async (query) => {
-    console.log("Searching with query:", query);
+    setLoading(true);
     try {
       const res = await reviewAPI.searchReviews(query);
       setInspections(res.data);
     } catch (error) {
       const message = error.error || "An error occurred";
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
   const onSubmit = async (query) => {
@@ -148,7 +151,7 @@ function InspectionPage() {
               <div className="form-label">Reason</div>
               <div className="form-row">{showReasons()}</div>
             </div>
-            <button type="submit" className="submit-button">
+            <button type="submit" className="submit-button" disabled={loading}>
               Search
             </button>
           </form>

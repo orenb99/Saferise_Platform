@@ -19,7 +19,7 @@ function Header() {
       <div className="button-div">
         <button
           onClick={() => {
-            navigate("/alerts");
+            navigate("/orders");
           }}
           className="bell-button header-button"
         >

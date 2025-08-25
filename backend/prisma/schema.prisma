@@ -22,7 +22,7 @@ model Inspector {
   isActive      Boolean @default(true)  // פעיל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
-  orders Orders[] // קשר לצווי בטיחות
+  orders Order[] // קשר לצווי בטיחות
 }
 enum InspectorType{
   Chief // ראשי
@@ -229,7 +229,7 @@ model Review {
   reviewInstructions ReviewInstruction[] // קשר להנחיות לתסקיר
   reviewAssemblies   ReviewAssembly[] // קשר לנושאים במכללים שנבדקו
   reviewDefects      ReviewDefect[] // קשר לכשלים בתסקיר
-  orders             Orders[] // קשר לצווי בטיחות
+  orders             Order[] // קשר לצווי בטיחות
 }
 enum ReviewReason{
   RoutineCheck // בדיקה שגרתית
@@ -288,7 +288,7 @@ model ReviewDefect {
 }
 
 // Orders Entity - צווי בטיחות (מוסק מהאפיון)
-model Orders {
+model Order {
   orderId      String   @id      // מזהה צו (PK)
   reviewId     String   // מזהה תסקיר (FK)
   review       Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
@@ -298,7 +298,7 @@ model Orders {
   orderContent String @db.Text   // תוכן הצו
   issueDate    DateTime // תאריך הפקה
   dueDate      DateTime // מועד ביצוע נדרש
-  status       Int      // סטטוס צו (CHEK LATER)
+  status       Int      // סטטוס צו (CHECK LATER)
   isActive     Boolean  // פעיל
   createdAt    DateTime @default(now()) // תאריך יצירה
   updatedAt    DateTime @updatedAt      // תאריך עדכון
