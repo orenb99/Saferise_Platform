@@ -24,7 +24,6 @@ model Inspector {
   isActive      Boolean @default(true)  // פעיל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
-  reviews       Review[] // קשר לתסקירים
   savedReports  SavedReport[] // קשר לדוחות שמורים
 }
 enum InspectorType{
@@ -123,15 +122,15 @@ enum SiteDesignation{ // יעוד אתר
 model SiteOwner {
   siteOwnerId     String   @id @db.VarChar(18)      // מזהה חשבון (PK)
   name          String @db.VarChar(255)   // שם
-  identityType  SiteOwnerIdentityType      // סוג זיהוי
+  identityType  IdentityType      // סוג זיהוי
   businessId            String @db.VarChar(20)   // מספר מזהה ארגון
-  phoneNumber   String @db.VarChar(20) // טלפון
-  email         String @db.VarChar(100) // כתובת מייל
+  phoneNumber   String? @db.VarChar(20) // טלפון
+  email         String? @db.VarChar(100) // כתובת מייל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
   sites Site[] // קשר לאתרים
 }
-enum SiteOwnerIdentityType{
+enum IdentityType{
   AuthorizedDealer // עוסק מורשה
   Association // עמותה
   PrivateCompany // ח.פ
@@ -142,8 +141,8 @@ model AssetOwner {
   name          String @db.VarChar(255)   // שם
   identityType  AssetOwnerIdentityType      // סוג זיהוי
   businessId            String @db.VarChar(20) @unique   // מספר מזהה ארגון
-  phoneNumber   String @db.VarChar(20) // טלפון
-  email         String @db.VarChar(100) // כתובת מייל
+  phoneNumber   String? @db.VarChar(20) // טלפון
+  email         String? @db.VarChar(100) // כתובת מייל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
   assets Asset[] // קשר למתקנים
@@ -171,25 +170,20 @@ model ServiceCompany {
 }
 
 /// בודק מוסמך
-model CertifiedInspector {
-  inspectorId        String   @id @db.VarChar(18)
-  firstName          String   @db.VarChar(100)
-  lastName           String   @db.VarChar(100)
+model Reviewer {
+  reviewerId         String   @id @db.VarChar(18)
+  fullName          String   @db.VarChar(100)
   phoneNumber        String   @db.VarChar(20)
   email              String   @unique @db.VarChar(100)
-  identityType      CertifiedInspectorType                 
+  identityType      IdentityType                 
   idNumber         String?   @db.VarChar(9)    
   certificateNumber  String   @unique @db.VarChar(50)
   certificationExpiry DateTime @db.Date
   isActive           Boolean  @default(true)
   createdDate        DateTime @default(now())
   modifiedDate       DateTime @default(now())
+  reviews Review[]
 
-}
-enum CertifiedInspectorType{
-  type1
-  type2
-  type3
 }
 
 /// המעלית
@@ -274,8 +268,8 @@ model Review {
   reviewId            String    @id @db.VarChar(18)
   assetId             String    @db.VarChar(18)
   asset               Asset     @relation(fields: [assetId], references: [assetId])
-  inspectorId         String    @db.VarChar(18)
-  inspector           Inspector @relation(fields: [inspectorId], references: [inspectorId])
+  reviewerId         String    @db.VarChar(18)
+  reviewer           Reviewer @relation(fields: [reviewerId], references: [reviewerId])
   assignedInspectorId  String?   @db.VarChar(18)
   reviewDate         DateTime  
   assetSystemSource  String    @db.VarChar(100)
