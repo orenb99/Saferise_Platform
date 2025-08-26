@@ -55,10 +55,11 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
     }
     const data = await prisma.review.findMany({
       where: searchQuery,
-      include: {
-        assetId: true,
+      select: {
+        reviewId: true,
         reviewDate: true,
-        ReviewerDecision: true,
+        assetId: true,
+        reviewerDecision: true,
         reviewer: {
           select: {
             reviewerId: true,
@@ -90,14 +91,14 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
     const { reviewId } = req.params;
     const review = await prisma.review.findUnique({
       where: { reviewId },
-      include: {
-        createdAt: false,
-        updatedAt: false,
-        alerts: false,
-        processingQueues: false,
+      select: {
+        reviewId: true,
+        defects: true,
+        assemblies: true,
+        instructions: true,
         reviewer: {
           select: {
-            accountId: true,
+            reviewerId: true,
             fullName: true,
           },
         },

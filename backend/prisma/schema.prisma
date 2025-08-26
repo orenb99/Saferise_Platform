@@ -93,8 +93,8 @@ model Site {
   siteType               SiteType 
   designation            SiteDesignation
   officeSerialNumber     String?  @db.VarChar(50) 
-  createdDate            DateTime @default(now())
-  modifiedDate           DateTime @default(now())
+  createdAt            DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   address   Address   @relation(fields: [addressId], references: [addressId])
   siteOwner SiteOwner @relation(fields: [siteOwnerId], references: [siteOwnerId])
@@ -165,8 +165,8 @@ model ServiceCompany {
   address          String?   @db.Text
   isActive         Boolean   @default(true)
   licenseExpiry    DateTime? @db.Date
-  createdDate      DateTime  @default(now())
-  modifiedDate     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   assets Asset[] // קשר למתקנים
 }
 
@@ -181,8 +181,8 @@ model Reviewer {
   certificateNumber  String   @unique @db.VarChar(50)
   certificationExpiry DateTime @db.Date
   isActive           Boolean  @default(true)
-  createdDate        DateTime @default(now())
-  modifiedDate       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   reviews Review[]
 
 }
@@ -221,8 +221,8 @@ model Asset {
   liftingDate         DateTime? @db.Date     
   lastInspectionDate   DateTime? @db.Date
   nextInspectionDue    DateTime? @db.Date
-  createdDate          DateTime @default(now())
-  modifiedDate         DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   reviews              Review[] // קשר לתסקירים
   safetyOrders        SafetyOrder[] // קשר לצווי בטיחות
   alerts               Alert[] // קשר להתראות
@@ -287,8 +287,8 @@ model Review {
   requiresOrder       Boolean   @default(false)
   processingError     String?   @db.Text
   originalDocumentPath String?  @db.VarChar(500)
-  createdDate         DateTime  @default(now())
-  modifiedDate        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
   instructions        ReviewInstruction[]
   assemblies         ReviewAssembly[]
   defects            ReviewDefect[]
@@ -329,8 +329,8 @@ model ReviewInstruction {
   review Review @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
   productInstruction   String    @db.VarChar(500)
   numberOfDaysToPursue Int?
-  createdDate          DateTime  @default(now())
-  modifiedDate         DateTime  @default(now())
+  createdAt          DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
 
   @@map("ReviewInstruction")
@@ -345,8 +345,8 @@ model ReviewAssembly {
   assemblySubject  String    @db.VarChar(200)
   assemblyStatus  AssemblyStatus       
   assemblyNotes   String?   @db.Text
-  createdDate      DateTime  @default(now())
-  modifiedDate     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 enum AssemblyStatus{
@@ -366,8 +366,8 @@ model ReviewDefect {
   severity         DefectSeverityLevel       
   isResolved       Boolean   @default(false)
   resolvedDate     DateTime?
-  createdDate      DateTime  @default(now())
-  modifiedDate     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 enum DefectSeverityLevel{
   Minor // קל
@@ -391,8 +391,8 @@ model SafetyOrder {
   complianceNotes     String?   @db.Text
   complianceDate      DateTime?
   complianceProof     String?   @db.VarChar(500)
-  createdDate         DateTime  @default(now())
-  modifiedDate        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   review Review @relation(fields: [reviewId], references: [reviewId])
   asset  Asset  @relation(fields: [assetId], references: [assetId])
@@ -430,8 +430,8 @@ model Alert {
   resolvedDate       DateTime?
   resolvedBy         String?   @db.VarChar(18)
   resolutionNotes    String?   @db.Text
-  createdDate        DateTime  @default(now())
-  modifiedDate       DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   asset       Asset?       @relation(fields: [assetId], references: [assetId])
   review      Review?      @relation(fields: [reviewId], references: [reviewId])
@@ -467,8 +467,8 @@ model ReportTemplate {
   chartDefinition  String?     @db.Text
   createdBy        String      @db.VarChar(18)
   isPublic         Boolean     @default(false)
-  createdDate      DateTime    @default(now())
-  modifiedDate     DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   savedReports     SavedReport[]
 }
 
@@ -495,7 +495,8 @@ model SavedReport {
   fileType        FileType
   isScheduled     Boolean   @default(false)
   scheduleDefinition String? @db.Text
-  createdDate     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   template ReportTemplate @relation(fields: [templateId], references: [templateId])
   inspector Inspector     @relation(fields: [generatedBy], references: [inspectorId])
@@ -560,8 +561,8 @@ model ProcessingQueue {
   processingCompleted DateTime?
   errorMessage        String?   @db.Text
   retryCount          Int       @default(0)
-  createdDate         DateTime  @default(now())
-
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime @updatedAt
   review Review? @relation(fields: [reviewId], references: [reviewId])
 
 }

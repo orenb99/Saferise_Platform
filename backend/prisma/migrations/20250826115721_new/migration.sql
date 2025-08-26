@@ -145,8 +145,8 @@ CREATE TABLE "Site" (
     "siteType" "SiteType" NOT NULL,
     "designation" "SiteDesignation" NOT NULL,
     "officeSerialNumber" VARCHAR(50),
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Site_pkey" PRIMARY KEY ("siteId")
 );
@@ -189,8 +189,8 @@ CREATE TABLE "ServiceCompany" (
     "address" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "licenseExpiry" DATE,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ServiceCompany_pkey" PRIMARY KEY ("serviceCompanyId")
 );
@@ -206,8 +206,8 @@ CREATE TABLE "Reviewer" (
     "certificateNumber" VARCHAR(50) NOT NULL,
     "certificationExpiry" DATE NOT NULL,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Reviewer_pkey" PRIMARY KEY ("reviewerId")
 );
@@ -242,8 +242,8 @@ CREATE TABLE "Asset" (
     "liftingDate" DATE,
     "lastInspectionDate" DATE,
     "nextInspectionDue" DATE,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Asset_pkey" PRIMARY KEY ("assetId")
 );
@@ -269,8 +269,8 @@ CREATE TABLE "Review" (
     "requiresOrder" BOOLEAN NOT NULL DEFAULT false,
     "processingError" TEXT,
     "originalDocumentPath" VARCHAR(500),
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("reviewId")
 );
@@ -281,8 +281,8 @@ CREATE TABLE "ReviewInstruction" (
     "reviewId" VARCHAR(18) NOT NULL,
     "productInstruction" VARCHAR(500) NOT NULL,
     "numberOfDaysToPursue" INTEGER,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ReviewInstruction_pkey" PRIMARY KEY ("instructionId")
 );
@@ -294,8 +294,8 @@ CREATE TABLE "ReviewAssembly" (
     "assemblySubject" VARCHAR(200) NOT NULL,
     "assemblyStatus" "AssemblyStatus" NOT NULL,
     "assemblyNotes" TEXT,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ReviewAssembly_pkey" PRIMARY KEY ("assemblyId")
 );
@@ -310,8 +310,8 @@ CREATE TABLE "ReviewDefect" (
     "severity" "DefectSeverityLevel" NOT NULL,
     "isResolved" BOOLEAN NOT NULL DEFAULT false,
     "resolvedDate" TIMESTAMP(3),
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ReviewDefect_pkey" PRIMARY KEY ("defectId")
 );
@@ -332,8 +332,8 @@ CREATE TABLE "SafetyOrder" (
     "complianceNotes" TEXT,
     "complianceDate" TIMESTAMP(3),
     "complianceProof" VARCHAR(500),
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "SafetyOrder_pkey" PRIMARY KEY ("orderId")
 );
@@ -356,8 +356,8 @@ CREATE TABLE "Alert" (
     "resolvedDate" TIMESTAMP(3),
     "resolvedBy" VARCHAR(18),
     "resolutionNotes" TEXT,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Alert_pkey" PRIMARY KEY ("alertId")
 );
@@ -373,8 +373,8 @@ CREATE TABLE "ReportTemplate" (
     "chartDefinition" TEXT,
     "createdBy" VARCHAR(18) NOT NULL,
     "isPublic" BOOLEAN NOT NULL DEFAULT false,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modifiedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ReportTemplate_pkey" PRIMARY KEY ("templateId")
 );
@@ -391,7 +391,8 @@ CREATE TABLE "SavedReport" (
     "fileType" "FileType" NOT NULL,
     "isScheduled" BOOLEAN NOT NULL DEFAULT false,
     "scheduleDefinition" TEXT,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "SavedReport_pkey" PRIMARY KEY ("reportId")
 );
@@ -443,7 +444,8 @@ CREATE TABLE "ProcessingQueue" (
     "processingCompleted" TIMESTAMP(3),
     "errorMessage" TEXT,
     "retryCount" INTEGER NOT NULL DEFAULT 0,
-    "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ProcessingQueue_pkey" PRIMARY KEY ("queueId")
 );
