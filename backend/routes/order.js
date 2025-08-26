@@ -8,10 +8,10 @@ router.get("/top", verifyToken, async (req, res) => {
     const { inspectorId } = req.inspector;
 
     // Count active orders for the inspector (CHECK FOR CHIEF INSPECTOR)
-    const count = await prisma.order.count({
+    const count = await prisma.safetyOrder.count({
       where: { inspectorId, isActive: true },
     });
-    const topFive = await prisma.order.findMany({
+    const topFive = await prisma.safetyOrder.findMany({
       where: { inspectorId, isActive: true },
       take: 5,
       orderBy: [{ orderType: "asc" }, { dueDate: "desc" }], // CHECK LATER THE SORTING KEY

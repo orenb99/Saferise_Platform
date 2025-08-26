@@ -9,10 +9,11 @@ const router = express.Router();
 // Sign Up Route
 router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
   try {
-    const { fullName, email, inspectorId, password, phoneNumber, region, inspectorType } = req.body;
+    const { fullName, email, inspectorId, password, phoneNumber, inspectorType, employeeId } =
+      req.body;
     // Check if user already exists
     const existingUser = await prisma.inspector.findFirst({
-      where: { OR: [{ email }, { inspectorId }, { phoneNumber }] },
+      where: { OR: [{ email }, { inspectorId }, { phoneNumber }, { employeeId }] },
     });
 
     if (existingUser) {
@@ -21,7 +22,9 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
           ? "email"
           : existingUser.inspectorId === inspectorId
           ? "ID"
-          : "phone number";
+          : existingUser.phoneNumber === phoneNumber
+          ? "phone number"
+          : "employee ID";
       return res.status(400).json({
         error: `User with this ${field} already exists`,
       });
@@ -33,7 +36,7 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
         fullName,
         email,
         password,
-        region,
+        employeeId,
         phoneNumber,
         inspectorType: inspectorType ? InspectorType.Regional : InspectorType.Chief,
       },
@@ -49,8 +52,8 @@ router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
         fullName: inspector.fullName,
         email: inspector.email,
         inspectorId: inspector.inspectorId,
+        employeeId: inspector.employeeId,
         phoneNumber: inspector.phoneNumber,
-        region: inspector.region,
         inspectorType: inspector.inspectorType,
       },
     });
@@ -110,7 +113,7 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
         email: inspector.email,
         inspectorId: inspector.inspectorId,
         phoneNumber: inspector.phoneNumber,
-        region: inspector.region,
+        employeeId: inspector.employeeId,
         inspectorType: inspector.inspectorType,
       },
     });
@@ -131,7 +134,7 @@ router.get("/me", verifyToken, async (req, res) => {
         email: req.inspector.email,
         inspectorId: req.inspector.inspectorId,
         phoneNumber: req.inspector.phoneNumber,
-        region: req.inspector.region,
+        employeeId: req.inspector.employeeId,
         inspectorType: req.inspector.inspectorType,
       },
     });

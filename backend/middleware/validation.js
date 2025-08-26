@@ -50,9 +50,9 @@ const validateSignup = [
     .withMessage(
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     ),
-  body("region")
+  body("employeeId")
     .isLength({ min: 3, max: 100 })
-    .withMessage("Region must be between 3 and 100 characters"),
+    .withMessage("Employee ID must be between 3 and 100 characters"),
   checkValidation,
   body("inspectorType").isBoolean().withMessage("Type must be a boolean"),
 ];

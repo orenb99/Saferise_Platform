@@ -6,11 +6,12 @@ const {
   validateSearchReviews,
   validateReviewId,
 } = require("../middleware/validation");
+const { ReviewerDecision } = require("@prisma/client");
 
 const router = express.Router();
 router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
   try {
-    const { query, toDate, fromDate, region, status } = req.query;
+    const { query, toDate, fromDate, status } = req.query;
     let searchQuery = {};
     // Build dynamic query based on provided parameters
     if (query) {
@@ -48,24 +49,31 @@ router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
         searchQuery.reviewDate.gte = new Date(fromDate);
       }
     }
-    if (region) {
-      // Change to coordinates and address checking
-    }
+
     if (status) {
       // Check what status should be
     }
     const data = await prisma.review.findMany({
       where: searchQuery,
       include: {
-        createdAt: false,
-        updatedAt: false,
+        assetId: true,
+        reviewDate: true,
+        ReviewerDecision: true,
         reviewer: {
           select: {
-            accountId: true,
+            reviewerId: true,
             fullName: true,
           },
         },
-        asset: true,
+        asset: {
+          select: {
+            site: {
+              select: {
+                addressId: true,
+              },
+            },
+          },
+        },
       },
     });
     return res.status(200).json({
@@ -85,6 +93,8 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
       include: {
         createdAt: false,
         updatedAt: false,
+        alerts: false,
+        processingQueues: false,
         reviewer: {
           select: {
             accountId: true,

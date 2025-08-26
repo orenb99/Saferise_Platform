@@ -25,6 +25,7 @@ model Inspector {
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
   savedReports  SavedReport[] // קשר לדוחות שמורים
+  safetyOrders SafetyOrder[]
 }
 enum InspectorType{
   Chief // ראשי
@@ -378,7 +379,8 @@ model SafetyOrder {
   orderId             String    @id @db.VarChar(18)
   reviewId            String    @db.VarChar(18)
   assetId             String    @db.VarChar(18)
-  issuedByInspectorId String    @db.VarChar(18)
+  inspectorId String    @db.VarChar(18)
+  inspector Inspector @relation(fields: [inspectorId], references: [inspectorId])
   orderType           OrderType 
   orderNumber         String    @unique @db.VarChar(50)
   orderContent        String    @db.Text

@@ -252,7 +252,7 @@ CREATE TABLE "Asset" (
 CREATE TABLE "Review" (
     "reviewId" VARCHAR(18) NOT NULL,
     "assetId" VARCHAR(18) NOT NULL,
-    "inspectorId" VARCHAR(18) NOT NULL,
+    "reviewerId" VARCHAR(18) NOT NULL,
     "assignedInspectorId" VARCHAR(18),
     "reviewDate" TIMESTAMP(3) NOT NULL,
     "assetSystemSource" VARCHAR(100) NOT NULL,
@@ -321,7 +321,7 @@ CREATE TABLE "SafetyOrder" (
     "orderId" VARCHAR(18) NOT NULL,
     "reviewId" VARCHAR(18) NOT NULL,
     "assetId" VARCHAR(18) NOT NULL,
-    "issuedByInspectorId" VARCHAR(18) NOT NULL,
+    "inspectorId" VARCHAR(18) NOT NULL,
     "orderType" "OrderType" NOT NULL,
     "orderNumber" VARCHAR(50) NOT NULL,
     "orderContent" TEXT NOT NULL,
@@ -512,7 +512,7 @@ ALTER TABLE "Asset" ADD CONSTRAINT "Asset_serviceCompanyId_fkey" FOREIGN KEY ("s
 ALTER TABLE "Review" ADD CONSTRAINT "Review_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("assetId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Review" ADD CONSTRAINT "Review_inspectorId_fkey" FOREIGN KEY ("inspectorId") REFERENCES "Inspector"("inspectorId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Review" ADD CONSTRAINT "Review_reviewerId_fkey" FOREIGN KEY ("reviewerId") REFERENCES "Reviewer"("reviewerId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ReviewInstruction" ADD CONSTRAINT "ReviewInstruction_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -522,6 +522,9 @@ ALTER TABLE "ReviewAssembly" ADD CONSTRAINT "ReviewAssembly_reviewId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "ReviewDefect" ADD CONSTRAINT "ReviewDefect_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SafetyOrder" ADD CONSTRAINT "SafetyOrder_inspectorId_fkey" FOREIGN KEY ("inspectorId") REFERENCES "Inspector"("inspectorId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "SafetyOrder" ADD CONSTRAINT "SafetyOrder_reviewId_fkey" FOREIGN KEY ("reviewId") REFERENCES "Review"("reviewId") ON DELETE RESTRICT ON UPDATE CASCADE;

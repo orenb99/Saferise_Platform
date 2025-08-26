@@ -80,10 +80,10 @@ app.get("/health", (req, res) => {
 });
 
 // Routes
+app.use("/public", express.static("./public")); // For files
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/orders", orderRoutes);
-
 // Handle 404
 app.use("*", (req, res) => {
   res.status(404).json({
