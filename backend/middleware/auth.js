@@ -5,7 +5,7 @@ const JWT_SECRET =
   process.env.JWT_SECRET || "your_super_secure_jwt_secret_key_change_this_in_production";
 
 const generateToken = (inspectorId) => {
-  return jwt.sign({ inspectorId }, JWT_SECRET, { expiresIn: "24h" }); // Change to 2h in production
+  return jwt.sign({ inspectorId }, JWT_SECRET, { expiresIn: "72h" }); // Change to 2h in production
 };
 
 const verifyToken = async (req, res, next) => {

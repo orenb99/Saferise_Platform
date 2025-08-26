@@ -22,7 +22,7 @@ router.get("/top", verifyToken, async (req, res) => {
         alertType: true,
       },
       take: 5,
-      orderBy: [{ priority: "desc" }, { dueDate: "desc" }], // CHECK LATER THE SORTING KEY
+      orderBy: [{ priority: "asc" }, { dueDate: "desc" }], // CHECK LATER THE SORTING KEY
     });
     res.status(200).json({ message: "Count fetched successfully", data: { count, topFive } });
   } catch (error) {

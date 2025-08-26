@@ -122,6 +122,12 @@ export const alertAPI = {
   },
 };
 
+export const publicAPI = {
+  fetchReviewPDF: (path) => {
+    return api.defaults.baseURL + "/public/reviews/" + path;
+  },
+};
+
 // Utility functions for local storage
 export const tokenStorage = {
   set: (token) => {

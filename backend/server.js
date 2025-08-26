@@ -14,18 +14,20 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Security middleware
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         styleSrc: ["'self'", "'unsafe-inline'"],
+//         scriptSrc: ["'self'"],
+//         imgSrc: ["'self'", "data:", "https:"],
+//         frameSrc: ["'self'", "http://localhost:3000"],
+//       },
+//     },
+//     crossOriginEmbedderPolicy: false,
+//   })
+// );
 // Test connection to database
 connectDB();
 
@@ -51,7 +53,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use(limiter);
+// app.use(limiter);
 
 // CORS configuration
 app.use(
@@ -80,7 +82,14 @@ app.get("/health", (req, res) => {
 });
 
 // Routes
-app.use("/public", express.static("./public")); // For files
+app.use(
+  "/api/public",
+  (req, res, next) => {
+    res.removeHeader("X-Frame-Options");
+    next();
+  },
+  express.static("./public")
+);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/alerts", alertRoutes);

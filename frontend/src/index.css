@@ -381,10 +381,10 @@ code {
   top: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent */
-  transition: 0.3 ease;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: 0.3s ease;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   z-index: 1000;
   transition: 0.2s ease;
@@ -396,11 +396,11 @@ code {
   color: black;
   padding: 20px;
   border-radius: 8px;
-  max-width: 794px;
+  max-width: 700px;
   width: max-content;
   height: max-content;
   height: 95%;
-  width: 90%;
+  width: 45%;
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.4s ease-out;

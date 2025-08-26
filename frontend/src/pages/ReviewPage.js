@@ -23,7 +23,6 @@ function ReviewPage() {
     setLoading(true);
     try {
       const res = await reviewAPI.searchReviews(query);
-      console.log(res.data);
       setReviews(res.data);
     } catch (error) {
       const message = error.error || "An error occurred";

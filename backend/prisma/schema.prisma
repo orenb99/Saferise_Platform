@@ -426,8 +426,6 @@ model Alert {
   description        String    @db.Text
   dueDate            DateTime?
   status             AlertStatus       @default(Open)
-  isRead             Boolean   @default(false)
-  readDate           DateTime?
   resolvedDate       DateTime?
   resolvedBy         String?   @db.VarChar(18)
   resolutionNotes    String?   @db.Text
@@ -519,7 +517,8 @@ model AssetSummary {
   criticalDefects  Int      @default(0)
   minorDefects     Int      @default(0)
   ordersIssued     Int      @default(0)
-  lastUpdated      DateTime @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   asset  Asset  @relation(fields: [assetId], references: [assetId])
   region Region @relation(fields: [regionId], references: [regionId])
@@ -532,7 +531,6 @@ model AssetSummary {
 model DashboardMetrics {
   metricId         String    @id @db.VarChar(18)
   regionId         String?   @db.VarChar(18)
-  metricDate       DateTime  @db.Date
   newReviewsToday  Int       @default(0)
   activeElevators  Int       @default(0)
   disabledElevators Int      @default(0)
@@ -540,11 +538,10 @@ model DashboardMetrics {
   expiredInspections Int     @default(0)
   criticalAlerts   Int       @default(0)
   pendingOrders    Int       @default(0)
-  lastUpdated      DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   region Region? @relation(fields: [regionId], references: [regionId])
-
-  @@unique([regionId, metricDate])
 }
 
 /// תור עיבוד תסקירים

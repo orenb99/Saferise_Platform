@@ -82,7 +82,7 @@ const SignIn = () => {
             {errors.inspectorId && (
               <div className="error-message">
                 <AlertCircle size={16} />
-                {errors.id.message}
+                {errors.inspectorId.message}
               </div>
             )}
           </div>

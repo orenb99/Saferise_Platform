@@ -91,11 +91,7 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
     const { reviewId } = req.params;
     const review = await prisma.review.findUnique({
       where: { reviewId },
-      select: {
-        reviewId: true,
-        defects: true,
-        assemblies: true,
-        instructions: true,
+      include: {
         reviewer: {
           select: {
             reviewerId: true,

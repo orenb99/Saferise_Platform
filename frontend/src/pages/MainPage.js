@@ -15,7 +15,6 @@ const MainPage = () => {
     const fetchAlerts = async () => {
       try {
         const response = await alertAPI.getTopFiveAlerts();
-        console.log("DATA:", response.data);
         setAlerts(response.data.topFive);
         setAlertCount(response.data.count);
       } catch (error) {
@@ -66,7 +65,6 @@ const MainPage = () => {
     }
   };
   const showAlerts = () => {
-    console.log(alerts);
     if (!alerts || alerts.length === 0) {
       return <div>No recent alerts</div>;
     }

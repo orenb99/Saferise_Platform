@@ -10,7 +10,6 @@ function AlertsPage() {
     const getOrders = async () => {
       try {
         const res = await alertAPI.getAllAlertsByInspector();
-        console.log(res);
         setOrders(res.data);
       } catch (error) {
         const message = error.error || "An error occurred";

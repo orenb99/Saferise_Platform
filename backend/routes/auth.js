@@ -92,7 +92,6 @@ router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
         error: "Invalid credentials. Please check your name, ID, and password.",
       });
     }
-
     // Check password
     const isPasswordValid = await prisma.inspector.comparePassword(password, inspector.password);
 
