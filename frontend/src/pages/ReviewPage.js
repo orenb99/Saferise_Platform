@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { set, useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-import InspectionPopUp from "../components/InspectionPopUp";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
-function InspectionPage() {
-  // The ID of the open inspection popup
-  const [openInspectionId, setOpenInspectionId] = useState(0);
+import ReviewPopUp from "../components/ReviewPopUp";
+function ReviewPage() {
+  // The ID of the open review popup
+  const [openReviewId, setOpenReviewId] = useState(0);
   // Data to show
-  const [inspections, setInspections] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const { inspector } = useAuth();
 
@@ -18,12 +18,13 @@ function InspectionPage() {
     formState: { errors },
   } = useForm();
 
-  // Search for inspections
+  // Search for reviews
   const searchQuery = async (query) => {
     setLoading(true);
     try {
       const res = await reviewAPI.searchReviews(query);
-      setInspections(res.data);
+      console.log(res.data);
+      setReviews(res.data);
     } catch (error) {
       const message = error.error || "An error occurred";
       toast.error(message);
@@ -35,7 +36,7 @@ function InspectionPage() {
     await searchQuery(query);
   };
   useEffect(() => {
-    // Initial load of inspections
+    // Initial load of reviews
     searchQuery({});
   }, []);
 
@@ -88,23 +89,28 @@ function InspectionPage() {
   };
 
   // Map the data
-  const mapInspections = () => {
-    return inspections.map((inspection) => (
-      <tr>
-        <td
-          onClick={() => {
-            setOpenInspectionId(inspection.reviewId);
-          }}
-        >
-          {inspection.reviewId}
+  const mapReviews = () => {
+    return reviews.map((review) => (
+      <tr
+        onClick={() => {
+          setOpenReviewId(review.reviewId);
+        }}
+      >
+        <td>{review.reviewId}</td>
+        <td>{review.assetId}</td>
+        <td>{review.asset.site.addressId}</td>
+        <td>{new Date(review.reviewDate).toLocaleDateString("en-GB")}</td>
+        <td>
+          {review.reviewer.reviewerId}: {review.reviewer.fullName}
         </td>
+        <td>{review.reviewerDecision}</td>
       </tr>
     ));
   };
   return (
     <div className="main-container">
       {/* Floating button "+" to add reports */}
-      <div className="inspection-container">
+      <div className="review-container">
         <div className="form-container">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-group">
@@ -112,7 +118,7 @@ function InspectionPage() {
                 id="query"
                 type="text"
                 className={`form-input`}
-                placeholder="Search for an inspection"
+                placeholder="Search for an review"
                 {...register("query")}
               />
             </div>
@@ -160,27 +166,21 @@ function InspectionPage() {
           <table>
             <thead>
               <tr>
-                <th>id</th>
-                <th>name</th>
-                <th>type</th>
-                <th>date</th>
-                <th>inspector</th>
-                <th>status</th>
-                <th>link</th>
+                <th>Review ID</th>
+                <th>Asset ID</th>
+                <th>Address ID</th>
+                <th>Review Date</th>
+                <th>Reviewer</th>
+                <th>Decision</th>
               </tr>
             </thead>
-            <tbody>{mapInspections()}</tbody>
+            <tbody>{mapReviews()}</tbody>
           </table>
-          {/* {JSON.stringify(inspections)} */}
         </div>
       </div>
-      {openInspectionId ? (
-        <InspectionPopUp setId={setOpenInspectionId} id={openInspectionId} />
-      ) : (
-        ""
-      )}
+      {openReviewId ? <ReviewPopUp setId={setOpenReviewId} id={openReviewId} /> : ""}
     </div>
   );
 }
 
-export default InspectionPage;
+export default ReviewPage;

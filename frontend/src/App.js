@@ -8,8 +8,7 @@ import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
 import OrdersPage from "./pages/OrdersPage";
 import GuestRoute from "./components/GuestRoute";
-import InspectionPage from "./pages/InspectionPage";
-
+import ReviewPage from "./pages/ReviewPage";
 function App() {
   return (
     <AuthProvider>
@@ -76,10 +75,10 @@ function App() {
               }
             />
             <Route
-              path="/inspections"
+              path="/reviews"
               element={
                 <ProtectedRoute>
-                  <InspectionPage />
+                  <ReviewPage />
                 </ProtectedRoute>
               }
             />

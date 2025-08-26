@@ -153,15 +153,15 @@ const MainPage = () => {
           </div>
         </div>
         <div className="sub-cards-container">
-          {/* Inspection search page banner */}
+          {/* Review search page banner */}
           <div
-            className="inspection-card sub-card "
+            className="review-card sub-card "
             onClick={() => {
-              navigate("/inspections");
+              navigate("/reviews");
             }}
           >
             <div className="welcome-title">
-              🔎 <span>Search for Inspections</span>
+              🔎 <span>Search for Reviews</span>
             </div>
           </div>
           {/* Orders page banner */}
