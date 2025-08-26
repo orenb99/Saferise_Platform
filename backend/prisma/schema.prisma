@@ -13,16 +13,19 @@ datasource db {
 // Inspector Entity - מפקח (מוסק מהאפיון)
 model Inspector {
   inspectorId   String   @id @db.VarChar(9)      // מזהה מפקח (PK)
-  fullName      String   // שם מלא
-  email         String   @unique// כתובת מייל
+  fullName      String   @db.VarChar(100)// שם מלא
+  email         String   @unique @db.VarChar(100) // כתובת מייל
   phoneNumber   String   @unique @db.VarChar(10)         // טלפון
   password      String   // סיסמה
+  employeeId    String   @unique @db.VarChar(20) // מספר עובד
   inspectorType InspectorType      // סוג מפקח 
-  region        String   // אזור אחריות
+  regionId      String?   // אזור אחריות
+  region        Region?   @relation(fields: [regionId], references: [regionId]) // קשר לאזור
   isActive      Boolean @default(true)  // פעיל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
-  orders Order[] // קשר לצווי בטיחות
+  reviews       Review[] // קשר לתסקירים
+  savedReports  SavedReport[] // קשר לדוחות שמורים
 }
 enum InspectorType{
   Chief // ראשי
@@ -31,29 +34,43 @@ enum InspectorType{
 
 
 model Product {
-  productId String @id // מזהה מוצר
-  name String // שם מוצר
+  productId String @id @db.VarChar(18) // מזהה מוצר
+  name String @db.VarChar(255) // שם מוצר
   productFamily ProductFamily // משפחת מוצר
   createdAt DateTime @default(now()) // תאריך יצירה
   updatedAt DateTime @updatedAt // תאריך עדכון
   assets Asset[] // קשר למתקנים
+
 }
 
 enum ProductFamily {
   Elevator // מעלית
   Lift // מעלון
 }
+model Region{
+  regionId String @id @db.VarChar(18) // מזהה אזור
+  name String @db.VarChar(100) // שם אזור
+  code String @db.VarChar(10) @unique // קוד אזור
+  description String? @db.Text // תיאור
+  isActive Boolean @default(true) // פעיל
+  createdAt DateTime @default(now()) // תאריך יצירה
+  updatedAt DateTime @updatedAt // תאריך עדכון
+  inspectors Inspector[] // קשר למפקחים
+  sites Site[] // קשר לאתרים
+  assetSummaries AssetSummary[] // קשר לסיכומי מעלית
+  dashboardMetrics DashboardMetrics[] // קשר למטריקות דשבורד
+}
 
 model Address {
-  addressId String @id  // מזהה כתובת
+  addressId String @id @db.VarChar(18)  // מזהה כתובת
   addressType AddressType // סוג כתובת
   city Int? // עיר
   street Int? // רחוב
   houseNumber Int // מספר בית
   houseEntrance Int // כניסה
   zipcode Int // מיקוד
-  geoLocationLatitude Decimal?  // קו אורך
-  geoLocationLongitude Decimal? // קו רוחב
+  geoLocationLatitude Decimal? @db.Decimal(10,8)  // קו אורך
+  geoLocationLongitude Decimal? @db.Decimal(10,8)// קו רוחב
   block Int?  // גוש
   plot Int? // חלקה
   createdAt DateTime @default(now())  // תאריך יצירה
@@ -67,19 +84,24 @@ enum AddressType {
   Coordinates // קואורדינטות
 }
 
+/// פרטי אתר
 model Site {
-  siteId String @id  // מזהה יחודי
-  addressId String // FK
-  address Address  @relation(fields: [addressId], references: [addressId]) // קשר לכתובת
-  siteAccountId String  // FK
-  siteOwner AccountSiteOwner @relation(fields: [siteAccountId], references: [accountId])  // קשר לבעל האתר
-  siteType SiteType  // סוג אתר
-  designation SiteDesignation // ייעוד אתר
-  officialSerialNumber String // Unique? // מספר מזהה אפיק
-  createdAt DateTime @default(now()) // תאריך יצירה
-  updatedAt DateTime @updatedAt // תאריך עדכון
-  assets Asset[] // קשר למתקנים
+  siteId                 String   @id @db.VarChar(18)
+  addressId              String   @db.VarChar(18)
+  siteOwnerId            String   @db.VarChar(18)
+  regionId               String   @db.VarChar(18)
+  siteType               SiteType 
+  designation            SiteDesignation
+  officeSerialNumber     String?  @db.VarChar(50) 
+  createdDate            DateTime @default(now())
+  modifiedDate           DateTime @default(now())
+
+  address   Address   @relation(fields: [addressId], references: [addressId])
+  siteOwner SiteOwner @relation(fields: [siteOwnerId], references: [siteOwnerId])
+  region    Region    @relation(fields: [regionId], references: [regionId])
+  assets    Asset[]   // קשר למתקנים
 }
+
 
 enum SiteType{ // סוג אתר
   Residential // מגורים
@@ -98,65 +120,121 @@ enum SiteDesignation{ // יעוד אתר
   Mall    // קניון
 }
 
-model AccountSiteOwner {
-  accountId     String   @id      // מזהה חשבון (PK)
-  name          String   // שם
-  identityType  identityType      // סוג זיהוי
-  businessId            String   // מספר מזהה ארגון
+model SiteOwner {
+  siteOwnerId     String   @id @db.VarChar(18)      // מזהה חשבון (PK)
+  name          String @db.VarChar(255)   // שם
+  identityType  SiteOwnerIdentityType      // סוג זיהוי
+  businessId            String @db.VarChar(20)   // מספר מזהה ארגון
+  phoneNumber   String @db.VarChar(20) // טלפון
+  email         String @db.VarChar(100) // כתובת מייל
   createdAt     DateTime @default(now()) // תאריך יצירה
   updatedAt     DateTime @updatedAt      // תאריך עדכון
   sites Site[] // קשר לאתרים
 }
-
-model AccountAssetOwner {
-  accountId     String   @id      // מזהה חשבון (PK)
-  name          String   // שם
-  identityType  identityType      // סוג זיהוי
-  businessId            String   // מספר מזהה ארגון
-  createdAt     DateTime @default(now()) // תאריך יצירה
-  updatedAt     DateTime @updatedAt      // תאריך עדכון
-  assets Asset[] // קשר למתקנים
-}
-
-enum identityType{
+enum SiteOwnerIdentityType{
   AuthorizedDealer // עוסק מורשה
   Association // עמותה
   PrivateCompany // ח.פ
 }
 
-model Asset {
-  assetId             String   @id      // מזהה מתקן (PK)
-  productId           String   // מזהה מוצר (FK)
-  product             Product  @relation(fields: [productId], references: [productId]) // קשר למוצר
-  siteId              String   // מזהה אתר (FK)
-  site                Site     @relation(fields: [siteId], references: [siteId]) // קשר לאתר
-  assetOwnerId        String   // מזהה בעל המתקן (FK)
-  assetOwner         AccountAssetOwner @relation(fields: [assetOwnerId], references: [accountId]) // קשר לבעל המתקן
-  name                String   // שם המתקן
-  installDate         DateTime // תאריך התקנה
-  assetPurpose        AssetPurpose      // ייעוד המתקן
-  serialNumber        String   // מספר המעלית (משרד העבודה)
-  officeSerialNumber  String   // מספר מתקן אפיק
-  status              Status      // מצב המתקן
-  marking             String   // סימון מתקן
-  ownerType           OwnerType      // סוג המחזיק במתקן
-  manufactureDate     DateTime // תאריך ייצור
-  engineNumber        String   // מספר מנוע
-  cellDoorType        CellDoorType      // סוג דלת תא
-  shaftDoorType       ShaftDoorType      // סוג דלת פיר
-  numberOfDoors       Int      // מספר דלתות
-  description         String  @db.Text  // תיאור
-  usageEndDate        DateTime // תאריך סיום שימוש
-  numberOfStations    Int      // מספר תחנות
-  metersHeight        Decimal  // גובה במטרים
-  weight              Decimal  // משקל נשיאה מותר
-  maxPassengers       Int      // מספר נוסעים מירבי
-  isLifting           Boolean  // הגבהה
-  liftingDate         DateTime // תאריך הגבהה
-  createdAt           DateTime @default(now()) // תאריך יצירה
-  updatedAt           DateTime @updatedAt      // תאריך עדכון
-  reviews Review[] // קשר לתסקירים
+model AssetOwner {
+  assetOwnerId     String   @id @db.VarChar(18)      // מזהה חשבון (PK)
+  name          String @db.VarChar(255)   // שם
+  identityType  AssetOwnerIdentityType      // סוג זיהוי
+  businessId            String @db.VarChar(20) @unique   // מספר מזהה ארגון
+  phoneNumber   String @db.VarChar(20) // טלפון
+  email         String @db.VarChar(100) // כתובת מייל
+  createdAt     DateTime @default(now()) // תאריך יצירה
+  updatedAt     DateTime @updatedAt      // תאריך עדכון
+  assets Asset[] // קשר למתקנים
 }
+
+enum AssetOwnerIdentityType{
+  AuthorizedDealer // עוסק מורשה
+  Association // עמותה
+  PrivateCompany // ח.פ
+  HouseComnittee // ועד בית
+}
+/// חברות השירות
+model ServiceCompany {
+  serviceCompanyId String    @id @db.VarChar(18)
+  name             String    @db.VarChar(255)
+  businessId       String    @unique @db.VarChar(20)
+  phone            String?   @db.VarChar(20)
+  email            String?   @db.VarChar(100)
+  address          String?   @db.Text
+  isActive         Boolean   @default(true)
+  licenseExpiry    DateTime? @db.Date
+  createdDate      DateTime  @default(now())
+  modifiedDate     DateTime  @default(now())
+  assets Asset[] // קשר למתקנים
+}
+
+/// בודק מוסמך
+model CertifiedInspector {
+  inspectorId        String   @id @db.VarChar(18)
+  firstName          String   @db.VarChar(100)
+  lastName           String   @db.VarChar(100)
+  phoneNumber        String   @db.VarChar(20)
+  email              String   @unique @db.VarChar(100)
+  identityType      CertifiedInspectorType                 
+  idNumber         String?   @db.VarChar(9)    
+  certificateNumber  String   @unique @db.VarChar(50)
+  certificationExpiry DateTime @db.Date
+  isActive           Boolean  @default(true)
+  createdDate        DateTime @default(now())
+  modifiedDate       DateTime @default(now())
+
+}
+enum CertifiedInspectorType{
+  type1
+  type2
+  type3
+}
+
+/// המעלית
+model Asset {
+  assetId              String   @id @db.VarChar(18)
+  productId            String   @db.VarChar(18)
+  product              Product  @relation(fields: [productId], references: [productId])
+  siteId               String   @db.VarChar(18)
+  site                 Site     @relation(fields: [siteId], references: [siteId])
+  assetOwnerId         String   @db.VarChar(18)
+  assetOwner           AssetOwner @relation(fields: [assetOwnerId], references: [assetOwnerId])
+  serviceCompanyId     String?  @db.VarChar(18)
+  serviceCompany       ServiceCompany? @relation(fields: [serviceCompanyId], references: [serviceCompanyId])
+  name                 String   @db.VarChar(255)
+  installDate         DateTime? @db.Date     
+  assetPurpose       AssetPurpose     
+  serialNumber         String   @unique @db.VarChar(50) 
+  officeSerialNumber  String?  @db.VarChar(50)
+  status              Status      @default(Active)
+  marking             String?  @db.VarChar(100)
+  ownerType           OwnerType      
+  manufactureDate     DateTime? @db.Date
+  engineNumber        String   @db.VarChar(100) 
+  cellDoorType        CellDoorType     
+  shaftDoorType       ShaftDoorType      
+  numberOfDoors      Int   
+  description        String   @db.Text 
+  usageEndDate        DateTime? @db.Date
+  numberOfStations    Int      
+  metersHeight        Decimal  @db.Decimal(8,2) 
+  weight              Decimal  @db.Decimal(10,2)
+  maxPassengers       Int     
+  isLifting           Boolean  @default(false)
+  liftingDate         DateTime? @db.Date     
+  lastInspectionDate   DateTime? @db.Date
+  nextInspectionDue    DateTime? @db.Date
+  createdDate          DateTime @default(now())
+  modifiedDate         DateTime @default(now())
+  reviews              Review[] // קשר לתסקירים
+  safetyOrders        SafetyOrder[] // קשר לצווי בטיחות
+  alerts               Alert[] // קשר להתראות
+  assetSummaries      AssetSummary[] // קשר לסיכומי מעלית
+
+}
+
 enum AssetPurpose{
   PassengerElevator // מעלית נוסעים
   FrightList // מעלית משא
@@ -190,46 +268,51 @@ enum ShaftDoorType {
   Other //אחר
 }
 
-// Account_Reviewer Entity - בודק מוסמך
-model AccountReviewer {
-  accountId           String   @id      // מזהה חשבון (PK)
-  fullName            String   // שם מלא
-  phoneNumber         String   // מספר טלפון
-  email               String   // כתובת מייל
-  identityType        Int      // סוג זיהוי (CHECK LATER)
-  idNumber            String   // מספר ת.ז.
-  isActive            Boolean  // פעיל
-  certificationExpiry DateTime // תוקף הסמכה
-  createdAt           DateTime @default(now()) // תאריך יצירה
-  updatedAt           DateTime @updatedAt      // תאריך עדכון
-  reviews Review[] // קשר לתסקירים
-}
-
 // Review Entity - התסקיר
+/// התסקיר
 model Review {
-  reviewId           String   @id      // מזהה תסקיר (PK)
-  assetId            String   // מזהה מתקן (FK)
-  asset              Asset    @relation(fields: [assetId], references: [assetId]) // קשר למתקן
-  reviewerId         String   // מזהה בודק (FK)
-  reviewer           AccountReviewer @relation(fields: [reviewerId], references: [accountId]) // קשר לבודק
-  technicianId       String?  // מזהה טכנאי (אופציונלי) - nullable
-  reviewDate         DateTime // תאריך ושעת ביצוע התסקיר
-  assetSystemSource  String   // המערכת ממנה הופק התסקיר
-  reviewReason       ReviewReason      // סיבת ביצוע התסקיר
-  reviewerNumber     String   // מספר תסקיר במערכת המקור
-  reviewerDecision   ReviewerDecision      // החלטת הבודק
-  totalRedeemDays    Int      // מספר ימים כולל לביצוע
-  maxWeightAllowed   Decimal  // משקל מקסימלי לאחר טיפול
-  maxPassengers      Int      // מספר מקסימלי נוסעים לאחר טיפול
-  summary            String @db.Text  // סיכום כללי
-  isProcessed        Boolean  // עובד
-  processingStatus   String   // סטטוס עיבוד
-  createdAt          DateTime @default(now()) // תאריך יצירה
-  updatedAt          DateTime @updatedAt      // תאריך עדכון
-  reviewInstructions ReviewInstruction[] // קשר להנחיות לתסקיר
-  reviewAssemblies   ReviewAssembly[] // קשר לנושאים במכללים שנבדקו
-  reviewDefects      ReviewDefect[] // קשר לכשלים בתסקיר
-  orders             Order[] // קשר לצווי בטיחות
+  reviewId            String    @id @db.VarChar(18)
+  assetId             String    @db.VarChar(18)
+  asset               Asset     @relation(fields: [assetId], references: [assetId])
+  inspectorId         String    @db.VarChar(18)
+  inspector           Inspector @relation(fields: [inspectorId], references: [inspectorId])
+  assignedInspectorId  String?   @db.VarChar(18)
+  reviewDate         DateTime  
+  assetSystemSource  String    @db.VarChar(100)
+  reviewReason       ReviewReason       
+  reviewerNumber     String    @db.VarChar(100)
+  reviewerDecision   ReviewerDecision       
+  totalRedeemDays    Int?
+  maxWeightAllowed   Decimal?  @db.Decimal(10,2)
+  maxPassengers      Int
+  summary            String    @db.Text
+  processingStatus    ReviewProcessingStatus  @default(Pending) 
+  processedDate       DateTime?
+  severityLevel       ReviewSeverityLevel       @default(OK) 
+  requiresOrder       Boolean   @default(false)
+  processingError     String?   @db.Text
+  originalDocumentPath String?  @db.VarChar(500)
+  createdDate         DateTime  @default(now())
+  modifiedDate        DateTime  @default(now())
+  instructions        ReviewInstruction[]
+  assemblies         ReviewAssembly[]
+  defects            ReviewDefect[]
+  safetyOrders       SafetyOrder[]
+  alerts             Alert[]
+  processingQueue   ProcessingQueue[]
+
+}
+enum ReviewSeverityLevel{
+  OK // נמוך
+  Minor // בינוני
+  Medium // גבוה
+  Critical // קריטי
+}
+enum ReviewProcessingStatus{
+  Pending // ממתין
+  InProgress // בטיפול
+  Completed // הושלם
+  Error // שגיאה
 }
 enum ReviewReason{
   RoutineCheck // בדיקה שגרתית
@@ -244,68 +327,252 @@ enum ReviewerDecision{
  Disable // להשבית
 }
 
-// ReviewInstruction Entity - הנחיות לתסקיר
+/// הנחיית התסקיר
 model ReviewInstruction {
-  instructionId      String   @id     // מזהה הנחיה (PK)
-  reviewId           String   // מזהה תסקיר (FK)
-  review            Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
-  productInstruction String @db.Text  // הנחיה לפי מוצר
-  numberOfDaysToPursue Int    // המלצה למספר ימים לביצוע
-  createdAt          DateTime @default(now()) // תאריך יצירה
-  updatedAt          DateTime @updatedAt      // תאריך עדכון
+  instructionId        String    @id @db.VarChar(18)
+  reviewId             String    @db.VarChar(18)
+  review Review @relation(fields: [reviewId], references: [reviewId], onDelete: Cascade)
+  productInstruction   String    @db.VarChar(500)
+  numberOfDaysToPursue Int?
+  createdDate          DateTime  @default(now())
+  modifiedDate         DateTime  @default(now())
+
+
+  @@map("ReviewInstruction")
 }
 
-// ReviewAssembly Entity - נושאים במכללים שנבדקו
+
+/// נושאים במכללים שנבדקו
 model ReviewAssembly {
-  assemblyId      String   @id      // מזהה בדיקת מכלול (PK)
-  reviewId        String   // מזהה תסקיר (FK)
-  review         Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
-  subject         String   // מזהה מכלול ונושא למוצר
-  assemblyStatus  AssemblyStatus      // סטטוס
-  assemblyNotes   String @db.Text  // הערות
-  createdAt       DateTime @default(now()) // תאריך יצירה
-  updatedAt       DateTime @updatedAt      // תאריך עדכון
+  assemblyId       String    @id @db.VarChar(18)
+  reviewId         String    @db.VarChar(18)
+  review Review @relation(fields: [reviewId], references: [reviewId])
+  assemblySubject  String    @db.VarChar(200)
+  assemblyStatus  AssemblyStatus       
+  assemblyNotes   String?   @db.Text
+  createdDate      DateTime  @default(now())
+  modifiedDate     DateTime  @default(now())
 }
+
 enum AssemblyStatus{
   OK // תקין
   NotOk // לא תקין
   NotChecked // לא נבדק
 }
 
-// ReviewDefect Entity - כשלים בתסקיר
+/// כשלים בתסקיר
 model ReviewDefect {
-  defectId           String   @id      // מזהה ליקוי (PK)
-  reviewId           String   // מזהה תסקיר (FK)
-  review            Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
-  subject            String   // נושא במכלול
-  subjectFinding     String @db.Text  // מזהה ממצא לפי נושא במכלול
-  defectDescription  String @db.Text  // תיאור התקלה
-  severity           Int      // דרגת חומרה (CHECK LATER)
-  isResolved         Boolean  // טופל 
-  resolvedDate       DateTime // תאריך טיפול
-  createdAt          DateTime @default(now()) // תאריך יצירה
-  updatedAt          DateTime @updatedAt      // תאריך עדכון
+  defectId         String    @id @db.VarChar(18)
+  reviewId         String    @db.VarChar(18)
+  review Review @relation(fields: [reviewId], references: [reviewId])
+  assemblySubject  String    @db.VarChar(200)
+  subjectFinding   String    @db.VarChar(200)
+  defectDescription String? @db.Text
+  severity         DefectSeverityLevel       
+  isResolved       Boolean   @default(false)
+  resolvedDate     DateTime?
+  createdDate      DateTime  @default(now())
+  modifiedDate     DateTime  @default(now())
+}
+enum DefectSeverityLevel{
+  Minor // קל
+  Medium // בינוני
+  Critical // חמור
+}
+/// צווי בטיחות
+model SafetyOrder {
+  orderId             String    @id @db.VarChar(18)
+  reviewId            String    @db.VarChar(18)
+  assetId             String    @db.VarChar(18)
+  issuedByInspectorId String    @db.VarChar(18)
+  orderType           OrderType 
+  orderNumber         String    @unique @db.VarChar(50)
+  orderContent        String    @db.Text
+  issueDate           DateTime  @default(now()) @db.Date
+  dueDate             DateTime? @db.Date
+  status              OrderStatus       @default(Open)
+  isActive            Boolean   @default(true)
+  complianceNotes     String?   @db.Text
+  complianceDate      DateTime?
+  complianceProof     String?   @db.VarChar(500)
+  createdDate         DateTime  @default(now())
+  modifiedDate        DateTime  @default(now())
+
+  review Review @relation(fields: [reviewId], references: [reviewId])
+  asset  Asset  @relation(fields: [assetId], references: [assetId])
+  alerts Alert[]
+
 }
 
-// Orders Entity - צווי בטיחות (מוסק מהאפיון)
-model Order {
-  orderId      String   @id      // מזהה צו (PK)
-  reviewId     String   // מזהה תסקיר (FK)
-  review       Review   @relation(fields: [reviewId], references: [reviewId]) // קשר לתסקיר
-  inspectorId  String   // מזהה מפקח (FK)
-  inspector    Inspector @relation(fields: [inspectorId], references: [inspectorId]) // קשר למפקח
-  orderType    OrderType      // סוג צו (1=השבתה מיידי, 2=תיקון ליקויים, 3=אישור תקינות)
-  orderContent String @db.Text   // תוכן הצו
-  issueDate    DateTime // תאריך הפקה
-  dueDate      DateTime // מועד ביצוע נדרש
-  status       Int      // סטטוס צו (CHECK LATER)
-  isActive     Boolean  // פעיל
-  createdAt    DateTime @default(now()) // תאריך יצירה
-  updatedAt    DateTime @updatedAt      // תאריך עדכון
-}
 enum OrderType{
   Disable // השבתה מיידית
   Fix // תיקון ליקויים
   Approve // אישור תקינות
 }
+enum OrderStatus{
+  Open // פתוח
+  InProgress // בטיפול
+  Expired // פג תוקף
+  Closed // בוטל
+}
 
+/// התראות
+model Alert {
+  alertId            String    @id @db.VarChar(18)
+  assetId            String?   @db.VarChar(18)
+  reviewId           String?   @db.VarChar(18)
+  safetyOrderId      String?   @db.VarChar(18)
+  assignedInspectorId String   @db.VarChar(18)
+  alertType          AlertType 
+  priority           AlertPriority
+  title              String    @db.VarChar(255)
+  description        String    @db.Text
+  dueDate            DateTime?
+  status             AlertStatus       @default(Open)
+  isRead             Boolean   @default(false)
+  readDate           DateTime?
+  resolvedDate       DateTime?
+  resolvedBy         String?   @db.VarChar(18)
+  resolutionNotes    String?   @db.Text
+  createdDate        DateTime  @default(now())
+  modifiedDate       DateTime  @default(now())
+
+  asset       Asset?       @relation(fields: [assetId], references: [assetId])
+  review      Review?      @relation(fields: [reviewId], references: [reviewId])
+  safetyOrder SafetyOrder? @relation(fields: [safetyOrderId], references: [orderId])
+}
+enum AlertPriority{
+  Critical // קריטית
+  Important // חשובה
+  Medium // בינוני
+  Information // מידע
+}
+enum AlertType{
+  Danger // סכנה
+  SeveareDefect // ליקוי חמור
+  InspectionDue   //חריגה מזמני טיפול
+  ScanningProblen // בעיית סריקה
+  Notification // התראה
+}
+enum AlertStatus{
+  Open // פתוח
+  InProgress // בטיפול
+  Resolved // נסגר
+  Rejected // נדחה
+}
+
+model ReportTemplate {
+  templateId       String      @id @db.VarChar(18)
+  name             String      @db.VarChar(255)
+  description      String?     @db.Text
+  reportType       ReportType  
+  queryDefinition  String      @db.Text
+  filterDefinition String?     @db.Text
+  chartDefinition  String?     @db.Text
+  createdBy        String      @db.VarChar(18)
+  isPublic         Boolean     @default(false)
+  createdDate      DateTime    @default(now())
+  modifiedDate     DateTime    @default(now())
+  savedReports     SavedReport[]
+}
+
+/// תבניות דוחות
+enum ReportType {
+  Status          // 1 = דוח סטטוס
+  ElevatorNoReview // 2 = מעליות ללא בדיקה
+  InspectorPerformance // 3 = ביצועי בודקים
+  SafetyTrends   // 4 = מגמות בטיחות
+  Orders          // 5 = צווי
+  Custom          // 6 = מותאם אישית
+}
+
+
+
+model SavedReport {
+  reportId        String    @id @db.VarChar(18)
+  templateId      String    @db.VarChar(18)
+  generatedBy     String    @db.VarChar(18)
+  name            String    @db.VarChar(255)
+  parameters      String?   @db.Text
+  generatedDate   DateTime  @default(now())
+  filePath        String    @db.VarChar(500)
+  fileType        FileType
+  isScheduled     Boolean   @default(false)
+  scheduleDefinition String? @db.Text
+  createdDate     DateTime  @default(now())
+
+  template ReportTemplate @relation(fields: [templateId], references: [templateId])
+  inspector Inspector     @relation(fields: [generatedBy], references: [inspectorId])
+}
+/// דוחות שמורים
+enum FileType {
+  PDF
+  Excel
+  PowerPoint
+}
+
+/// סיכום נתוני מעלית
+model AssetSummary {
+  summaryId       String    @id @db.VarChar(18)
+  assetId         String    @db.VarChar(18)
+  regionId        String    @db.VarChar(18)
+  summaryDate     DateTime  @db.Date
+  totalInspections Int      @default(0)
+  criticalDefects  Int      @default(0)
+  minorDefects     Int      @default(0)
+  ordersIssued     Int      @default(0)
+  lastUpdated      DateTime @default(now())
+
+  asset  Asset  @relation(fields: [assetId], references: [assetId])
+  region Region @relation(fields: [regionId], references: [regionId])
+
+  @@unique([assetId, summaryDate])
+}
+
+
+/// מטריקות דשבורד
+model DashboardMetrics {
+  metricId         String    @id @db.VarChar(18)
+  regionId         String?   @db.VarChar(18)
+  metricDate       DateTime  @db.Date
+  newReviewsToday  Int       @default(0)
+  activeElevators  Int       @default(0)
+  disabledElevators Int      @default(0)
+  underMaintenance Int       @default(0)
+  expiredInspections Int     @default(0)
+  criticalAlerts   Int       @default(0)
+  pendingOrders    Int       @default(0)
+  lastUpdated      DateTime  @default(now())
+
+  region Region? @relation(fields: [regionId], references: [regionId])
+
+  @@unique([regionId, metricDate])
+}
+
+/// תור עיבוד תסקירים
+model ProcessingQueue {
+  queueId             String    @id @db.VarChar(18)
+  emailId             String    @db.VarChar(100)
+  emailSubject        String?   @db.VarChar(500)
+  emailSender         String    @db.VarChar(255)
+  emailReceived       DateTime
+  attachmentName      String?   @db.VarChar(255)
+  attachmentPath      String?   @db.VarChar(500)
+  processingStatus    QueueProcessingStatus       @default(WaitingOCR)
+  reviewId            String?   @db.VarChar(18)
+  processingStarted   DateTime?
+  processingCompleted DateTime?
+  errorMessage        String?   @db.Text
+  retryCount          Int       @default(0)
+  createdDate         DateTime  @default(now())
+
+  review Review? @relation(fields: [reviewId], references: [reviewId])
+
+}
+enum QueueProcessingStatus {
+  WaitingOCR      // 1
+  InProgress       // 2
+  AIProcessing    // 3
+  Completed        // 4
+  Error            // 5
+}
