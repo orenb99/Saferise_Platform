@@ -102,19 +102,19 @@ export const reviewAPI = {
   },
 };
 
-export const orderAPI = {
+export const alertAPI = {
   // No need to pass inspectorId, it's passed with the token
-  getAllOrdersByInspector: async () => {
+  getAllAlertsByInspector: async () => {
     try {
-      const response = await api.get(`/orders/all`);
+      const response = await api.get(`/alerts/all`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Network error occurred" };
     }
   },
-  getTopFiveOrders: async () => {
+  getTopFiveAlerts: async () => {
     try {
-      const response = await api.get(`/orders/top`);
+      const response = await api.get(`/alerts/top`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: "Network error occurred" };

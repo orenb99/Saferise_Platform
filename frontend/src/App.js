@@ -6,7 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import MainPage from "./pages/MainPage";
-import OrdersPage from "./pages/OrdersPage";
+import AlertsPage from "./pages/AlertsPage";
 import GuestRoute from "./components/GuestRoute";
 import ReviewPage from "./pages/ReviewPage";
 function App() {
@@ -67,10 +67,10 @@ function App() {
               }
             />
             <Route
-              path="/orders"
+              path="/alerts"
               element={
                 <ProtectedRoute>
-                  <OrdersPage />
+                  <AlertsPage />
                 </ProtectedRoute>
               }
             />

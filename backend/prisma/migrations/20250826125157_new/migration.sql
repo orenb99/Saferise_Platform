@@ -17,7 +17,7 @@ CREATE TYPE "SiteDesignation" AS ENUM ('Residential', 'Hotel', 'Hospital', 'Gove
 CREATE TYPE "IdentityType" AS ENUM ('AuthorizedDealer', 'Association', 'PrivateCompany');
 
 -- CreateEnum
-CREATE TYPE "AssetOwnerIdentityType" AS ENUM ('AuthorizedDealer', 'Association', 'PrivateCompany', 'HouseComnittee');
+CREATE TYPE "AssetOwnerIdentityType" AS ENUM ('AuthorizedDealer', 'Association', 'PrivateCompany', 'HouseCommittee');
 
 -- CreateEnum
 CREATE TYPE "AssetPurpose" AS ENUM ('PassengerElevator', 'FrightList', 'Service', 'Construction', 'Other');
@@ -26,10 +26,10 @@ CREATE TYPE "AssetPurpose" AS ENUM ('PassengerElevator', 'FrightList', 'Service'
 CREATE TYPE "Status" AS ENUM ('Active', 'Disabled');
 
 -- CreateEnum
-CREATE TYPE "OwnerType" AS ENUM ('Company', 'HouseComnittee', 'PrivatePerson');
+CREATE TYPE "OwnerType" AS ENUM ('Company', 'HouseCommittee', 'PrivatePerson');
 
 -- CreateEnum
-CREATE TYPE "CellDoorType" AS ENUM ('Wing', 'AutoCenter', 'AutoRight', 'AutoLeft', 'VerticalMaunal', 'VerticalAuto', 'HorizontalAuto', 'None');
+CREATE TYPE "CellDoorType" AS ENUM ('Wing', 'AutoCenter', 'AutoRight', 'AutoLeft', 'VerticalManual', 'VerticalAuto', 'HorizontalAuto', 'None');
 
 -- CreateEnum
 CREATE TYPE "ShaftDoorType" AS ENUM ('Auto', 'Wing', 'Other');
@@ -62,7 +62,7 @@ CREATE TYPE "OrderStatus" AS ENUM ('Open', 'InProgress', 'Expired', 'Closed');
 CREATE TYPE "AlertPriority" AS ENUM ('Critical', 'Important', 'Medium', 'Information');
 
 -- CreateEnum
-CREATE TYPE "AlertType" AS ENUM ('Danger', 'SeveareDefect', 'InspectionDue', 'ScanningProblen', 'Notification');
+CREATE TYPE "AlertType" AS ENUM ('Danger', 'SevereDefect', 'InspectionDue', 'ScanningProblem', 'Notification');
 
 -- CreateEnum
 CREATE TYPE "AlertStatus" AS ENUM ('Open', 'InProgress', 'Resolved', 'Rejected');
@@ -344,7 +344,7 @@ CREATE TABLE "Alert" (
     "assetId" VARCHAR(18),
     "reviewId" VARCHAR(18),
     "safetyOrderId" VARCHAR(18),
-    "assignedInspectorId" VARCHAR(18) NOT NULL,
+    "inspectorId" VARCHAR(18) NOT NULL,
     "alertType" "AlertType" NOT NULL,
     "priority" "AlertPriority" NOT NULL,
     "title" VARCHAR(255) NOT NULL,
@@ -533,6 +533,9 @@ ALTER TABLE "SafetyOrder" ADD CONSTRAINT "SafetyOrder_reviewId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "SafetyOrder" ADD CONSTRAINT "SafetyOrder_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("assetId") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Alert" ADD CONSTRAINT "Alert_inspectorId_fkey" FOREIGN KEY ("inspectorId") REFERENCES "Inspector"("inspectorId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Alert" ADD CONSTRAINT "Alert_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("assetId") ON DELETE SET NULL ON UPDATE CASCADE;

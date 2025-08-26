@@ -2,28 +2,28 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { MessageSquare, User, Shield, Mail, IdCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { orderAPI } from "../services/api";
+import { alertAPI } from "../services/api";
 import toast from "react-hot-toast";
 
 const MainPage = () => {
   let navigate = useNavigate();
   const { inspector } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [ordersCount, setOrdersCount] = useState(0);
+  const [alerts, setAlerts] = useState([]);
+  const [alertCount, setAlertCount] = useState(0);
   useEffect(() => {
     if (!inspector) return;
-    const fetchOrders = async () => {
+    const fetchAlerts = async () => {
       try {
-        const response = await orderAPI.getTopFiveOrders();
+        const response = await alertAPI.getTopFiveAlerts();
         console.log("DATA:", response.data);
-        setOrders(response.data.topFive);
-        setOrdersCount(response.data.count);
+        setAlerts(response.data.topFive);
+        setAlertCount(response.data.count);
       } catch (error) {
         const message = error.error || "An error occurred";
         toast.error(message);
       }
     };
-    fetchOrders();
+    fetchAlerts();
   }, [inspector]);
   if (!inspector) {
     return (
@@ -56,27 +56,27 @@ const MainPage = () => {
   };
 
   const showNotification = () => {
-    if (ordersCount > 0) {
+    if (alertCount > 0) {
       return (
         <span className="notification">
-          <div className="notification-inner">{ordersCount}</div>
+          <div className="notification-inner">{alertCount}</div>
           <MessageSquare size={60} fill="red" color="black" strokeWidth="0.2px" />
         </span>
       );
     }
   };
-  const showOrders = () => {
-    console.log(orders);
-    if (!orders || orders.length === 0) {
-      return <div>No recent orders</div>;
+  const showAlerts = () => {
+    console.log(alerts);
+    if (!alerts || alerts.length === 0) {
+      return <div>No recent alerts</div>;
     }
-    return orders.map((order) => (
-      <div key={order.orderId} className="order-item">
-        <div>{order.orderId}</div>
-        <div>{order.reviewId}</div>
-        <div>{order.orderType}</div>
-        <div>{order.status}</div>
-        <div>{new Date(order.dueDate).toLocaleDateString("en-GB")}</div>
+    return alerts.map((alert) => (
+      <div key={alert.alertId} className="alert-item">
+        <div>{alert.title}</div>
+        <div>{alert.priority}</div>
+        <div>{alert.alertType}</div>
+        <div>{alert.status}</div>
+        <div>{new Date(alert.dueDate).toLocaleDateString("en-GB")}</div>
       </div>
     ));
   };
@@ -164,26 +164,26 @@ const MainPage = () => {
               🔎 <span>Search for Reviews</span>
             </div>
           </div>
-          {/* Orders page banner */}
+          {/* Alerts page banner */}
           <div className="notification-target">
             <div
-              className="order-card sub-card"
+              className="alert-card sub-card"
               onClick={() => {
-                navigate("/orders");
+                navigate("/alerts");
               }}
             >
               {showNotification()}
 
               <div className="welcome-title">
-                🚨 <span>View Your Orders</span>
+                🚨 <span>View Your Alerts</span>
               </div>
               <div
-                className="top-five-orders"
+                className="top-five-alerts"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
               >
-                {showOrders()}
+                {showAlerts()}
               </div>
             </div>
           </div>

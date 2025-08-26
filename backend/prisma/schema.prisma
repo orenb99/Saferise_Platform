@@ -26,6 +26,7 @@ model Inspector {
   updatedAt     DateTime @updatedAt      // תאריך עדכון
   savedReports  SavedReport[] // קשר לדוחות שמורים
   safetyOrders SafetyOrder[]
+  alerts Alert[]
 }
 enum InspectorType{
   Chief // ראשי
@@ -153,7 +154,7 @@ enum AssetOwnerIdentityType{
   AuthorizedDealer // עוסק מורשה
   Association // עמותה
   PrivateCompany // ח.פ
-  HouseComnittee // ועד בית
+  HouseCommittee // ועד בית
 }
 /// חברות השירות
 model ServiceCompany {
@@ -243,7 +244,7 @@ enum Status{
 }
 enum OwnerType{
   Company // חברה
-  HouseComnittee // ועד בית
+  HouseCommittee // ועד בית
   PrivatePerson // אדם פרטי
 }
 
@@ -252,7 +253,7 @@ enum CellDoorType{
  AutoCenter // אוטומטיות מרכזיות
  AutoRight // אוטומטיות ימניות
  AutoLeft // אוטומטיות שמאליות
- VerticalMaunal // אנכי ידני
+ VerticalManual // אנכי ידני
  VerticalAuto // אנכי אוטומטי
  HorizontalAuto // אופקי אוטומטי
  None // ללא תא דלת
@@ -418,7 +419,7 @@ model Alert {
   assetId            String?   @db.VarChar(18)
   reviewId           String?   @db.VarChar(18)
   safetyOrderId      String?   @db.VarChar(18)
-  assignedInspectorId String   @db.VarChar(18)
+  inspectorId String   @db.VarChar(18)
   alertType          AlertType 
   priority           AlertPriority
   title              String    @db.VarChar(255)
@@ -432,7 +433,7 @@ model Alert {
   resolutionNotes    String?   @db.Text
   createdAt        DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-
+  inspector Inspector @relation(fields:[inspectorId], references: [inspectorId])
   asset       Asset?       @relation(fields: [assetId], references: [assetId])
   review      Review?      @relation(fields: [reviewId], references: [reviewId])
   safetyOrder SafetyOrder? @relation(fields: [safetyOrderId], references: [orderId])
@@ -445,9 +446,9 @@ enum AlertPriority{
 }
 enum AlertType{
   Danger // סכנה
-  SeveareDefect // ליקוי חמור
+  SevereDefect // ליקוי חמור
   InspectionDue   //חריגה מזמני טיפול
-  ScanningProblen // בעיית סריקה
+  ScanningProblem // בעיית סריקה
   Notification // התראה
 }
 enum AlertStatus{

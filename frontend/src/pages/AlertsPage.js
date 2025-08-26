@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { orderAPI } from "../services/api";
+import { alertAPI } from "../services/api";
 import toast from "react-hot-toast";
-function OrdersPage() {
+function AlertsPage() {
   const { inspector } = useAuth();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await orderAPI.getAllOrdersByInspector();
+        const res = await alertAPI.getAllAlertsByInspector();
         console.log(res);
         setOrders(res.data);
       } catch (error) {
@@ -48,4 +48,4 @@ function OrdersPage() {
   return <div className="main-container">{mapData()}</div>;
 }
 
-export default OrdersPage;
+export default AlertsPage;

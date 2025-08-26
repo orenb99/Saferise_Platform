@@ -279,7 +279,7 @@ code {
   position: relative; /* Required for absolute positioning */
 }
 
-.order-card .notification {
+.alert-card .notification {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -288,13 +288,13 @@ code {
   right: -36px;
 }
 
-.order-card .notification .notification-inner {
+.alert-card .notification .notification-inner {
   position: absolute;
   width: 70%;
   text-align: center;
   padding-bottom: 10px;
 }
-.order-card .top-five-orders .order-item {
+.alert-card .top-five-alerts .alert-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
