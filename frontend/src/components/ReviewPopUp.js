@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { reviewAPI, publicAPI } from "../services/api";
+import { reviewAPI, publicAPI, orderAPI } from "../services/api";
 import toast from "react-hot-toast";
 import DynamicUpdateField from "./DynamicUpdateField";
 function ReviewPopUp({ id, setId }) {
@@ -26,6 +26,32 @@ function ReviewPopUp({ id, setId }) {
     setReview(newData);
     setChanged(true);
   };
+
+  {
+    /* creates an order from the review*/
+  }
+  const createOrder = async () => {
+    // Demo data
+    const orderData = {
+      orderId: "SO003",
+      reviewId: id,
+      orderNumber: "003",
+      orderContent: "Content",
+      dueDate: new Date(new Date().getTime() + 1209600000), // 14 days from now
+      orderType: "Disable",
+    };
+    try {
+      await orderAPI.createOrder(orderData);
+      toast.success("Order created");
+    } catch (error) {
+      const message = error.error || "An error occurred";
+      toast.error(message);
+    }
+  };
+
+  {
+    /* List the deficiencies */
+  }
   const mapDeficiencies = () => {
     return deficiencies.map((item, index) => {});
   };
@@ -134,6 +160,7 @@ function ReviewPopUp({ id, setId }) {
           >
             {editing ? "Done" : "Edit"}
           </button>
+          <button onClick={createOrder}>Create Order</button>
         </div>
       </div>
       {isFileOpen ? (

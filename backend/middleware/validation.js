@@ -102,10 +102,18 @@ const validateReviewId = [
     .withMessage("Invalid review ID"),
   checkValidation,
 ];
+// FILL LATER
+const validateOrder = [
+  param("orderId")
+    .matches(/^[a-zA-Z0-9]{0,18}$/)
+    .withMessage("Invalid order ID"),
+  checkValidation,
+];
 module.exports = {
   sanitizeInput,
   validateSignup,
   validateSignin,
   validateSearchReviews,
   validateReviewId,
+  validateOrder,
 };

@@ -5,6 +5,7 @@ const rateLimit = require("express-rate-limit");
 const authRoutes = require("./routes/auth");
 const reviewRoutes = require("./routes/review");
 const alertRoutes = require("./routes/alert");
+const orderRoutes = require("./routes/order");
 const connectDB = require("./prisma/database");
 
 // Load environment variables
@@ -14,20 +15,18 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // Security middleware
-// app.use(
-//   helmet({
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         styleSrc: ["'self'", "'unsafe-inline'"],
-//         scriptSrc: ["'self'"],
-//         imgSrc: ["'self'", "data:", "https:"],
-//         frameSrc: ["'self'", "http://localhost:3000"],
-//       },
-//     },
-//     crossOriginEmbedderPolicy: false,
-//   })
-// );
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
+    },
+  })
+);
 // Test connection to database
 connectDB();
 
@@ -53,7 +52,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// app.use(limiter);
+app.use(limiter);
 
 // CORS configuration
 app.use(
@@ -93,6 +92,7 @@ app.use(
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/alerts", alertRoutes);
+app.use("/api/orders", orderRoutes);
 // Handle 404
 app.use("*", (req, res) => {
   res.status(404).json({

@@ -102,6 +102,17 @@ export const reviewAPI = {
   },
 };
 
+export const orderAPI = {
+  createOrder: async (order) => {
+    try {
+      const response = await api.post("/orders", order);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
+};
+
 export const alertAPI = {
   // No need to pass inspectorId, it's passed with the token
   getAllAlertsByInspector: async () => {
