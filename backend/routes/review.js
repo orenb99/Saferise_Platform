@@ -124,26 +124,54 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
 
 router.put("/:reviewId", validateReviewId, validateReview, verifyToken, async (req, res) => {
   try {
+    // (NOTE FOR NEXT DEVELOPER)
+    // The idea behind this type of update, which is delete all and then recreate, is so we could be able to add and remove
+    // instructions, defects and assemblies from the review.
     const { reviewId } = req.params;
-    const { defects, assemblies, instructions, ...otherFields } = req.body;
-
+    // Remove the relations before updating
+    const { defects, assemblies, instructions, asset, reviewer, reviewDate, ...otherFields } =
+      req.body;
+      
+    // Fix the date format for reviewDate
+    const date = new Date(reviewDate);
+    if (date !== "Invalid Date") {
+      otherFields.reviewDate = date;
+    }
+    // Filter out problematic fields (PK, FK and read only fields)
+    const cleanDefects = defects.map(
+      ({ reviewId, createdAt, updatedAt, assetId, resolvedDate, ...rest }) => {
+        // Fix the date format for resolvedDate
+        const date = new Date(resolvedDate);
+        if (date !== "Invalid Date") {
+          return { ...rest, resolvedDate: date };
+        }
+        return rest;
+      }
+    );
+    const cleanInstructions = instructions.map(
+      ({ reviewId, createdAt, updatedAt, assetId, ...rest }) => rest
+    );
+    const cleanAssemblies = assemblies.map(
+      ({ reviewId, createdAt, updatedAt, assetId, ...rest }) => rest
+    );
     const updatedReview = await prisma.review.update({
       where: { reviewId },
       data: {
         ...otherFields,
         defects: {
           deleteMany: {}, // deletes all existing defects for this review
-          createMany: { data: defects || [] }, // Adding all the new ones
+          createMany: { data: cleanDefects || [] }, // Adding all the new ones
         },
         instructions: {
           deleteMany: {},
-          createMany: { data: instructions || [] },
+          createMany: { data: cleanInstructions || [] },
         },
         assemblies: {
           deleteMany: {},
-          createMany: { data: assemblies || [] },
+          createMany: { data: cleanAssemblies || [] },
         },
       },
+      // For the review
       include: {
         defects: true,
         instructions: true,

@@ -27,15 +27,10 @@ function ReviewPopUp({ id, setId }) {
     const dataToSend = { ...review, defects, assemblies, instructions };
     // To prevent extra clicks and show loading message
     setReview(null);
-    // delete dataToSend.reviewId;
-    // delete dataToSend.assetId;
-    // delete dataToSend.asset;
-    // delete dataToSend.reviewer;
-    // delete dataToSend.reviewerId;
     try {
       const response = await reviewAPI.updateReviewById(id, dataToSend);
-      console.log(response.data);
       setReview(response.data);
+      setChanged(false);
     } catch (error) {
       const message = error.error || "An error occurred";
       toast.error(message);
