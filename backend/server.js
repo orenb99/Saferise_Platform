@@ -7,7 +7,7 @@ const reviewRoutes = require("./routes/review");
 const alertRoutes = require("./routes/alert");
 const orderRoutes = require("./routes/order");
 const connectDB = require("./prisma/database");
-
+const path = require("path");
 // Load environment variables
 require("dotenv").config();
 
@@ -25,6 +25,7 @@ app.use(
         imgSrc: ["'self'", "data:", "https:"],
       },
     },
+    frameguard: false, // disables X-Frame-Options header for pdf extraction
   })
 );
 // Test connection to database
@@ -84,10 +85,18 @@ app.get("/health", (req, res) => {
 app.use(
   "/api/public",
   (req, res, next) => {
-    res.removeHeader("X-Frame-Options");
+    // Allow embedding from your frontend
+    res.setHeader(
+      "Content-Security-Policy",
+      `frame-ancestors 'self' ${
+        process.env.NODE_ENV === "production"
+          ? ["https://yourdomain.com"]
+          : ["http://localhost:3000"]
+      }`
+    );
     next();
   },
-  express.static("./public")
+  express.static(path.join(__dirname, "public"))
 );
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/reviews", reviewRoutes);

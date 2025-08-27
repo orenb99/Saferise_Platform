@@ -165,7 +165,6 @@ function ReviewPopUp({ id, setId }) {
       </div>
       {isFileOpen ? (
         <iframe
-          // Doesn't work for now
           src={publicAPI.fetchReviewPDF(review.originalDocumentPath)}
           width="700px"
           height="100%" // Adjust height as needed

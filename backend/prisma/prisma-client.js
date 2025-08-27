@@ -26,7 +26,7 @@ prisma_base.$use(async (params, next) => {
       const result = await next(params);
       // Create the pdf
       createOrderPDF(params.args.data);
-      // TODO : create a corresponding alert
+      // TODO : create a corresponding alert, and maybe close the review
       return result;
     }
   } else {

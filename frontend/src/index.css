@@ -382,7 +382,7 @@ code {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  transition: 0.3s ease;
+  transition: all 0.4s ease-in-out;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -404,6 +404,7 @@ code {
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.4s ease-out;
+  transition: all 0.3s ease;
 }
 .popup-overlay .popup .popup-close {
   position: absolute;
