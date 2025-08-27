@@ -2,29 +2,44 @@ import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { reviewAPI, publicAPI, orderAPI } from "../services/api";
 import toast from "react-hot-toast";
-import DynamicUpdateField from "./DynamicUpdateField";
+import DynamicUpdateField from "./ReviewPopUpComponents.js/DynamicUpdateField";
+import DefectsBlock from "./ReviewPopUpComponents.js/DefectsBlock";
 function ReviewPopUp({ id, setId }) {
   const [review, setReview] = useState(null);
   // nested objects in review. helps for updating
   const [instructions, setInstructions] = useState([]);
   const [assemblies, setAssemblies] = useState([]);
-  const [deficiencies, setDeficiencies] = useState([]);
+  const [defects, setDefects] = useState([]);
+
   const [isFileOpen, setIsFileOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [changed, setChanged] = useState(false);
 
   // A method for updating nested fields
-  const updateField = (field, value, index) => {
+  const updateField = (field, value) => {
     let newData = { ...review };
-    // If the data is an array
-    if (index) {
-      newData[index][field] = value;
-    } // If its not an array
-    else {
-      newData[field] = value;
-    }
+    newData[field] = value;
     setReview(newData);
     setChanged(true);
+  };
+
+  const saveChanges = async () => {
+    const dataToSend = { ...review, defects, assemblies, instructions };
+    // To prevent extra clicks and show loading message
+    setReview(null);
+    // delete dataToSend.reviewId;
+    // delete dataToSend.assetId;
+    // delete dataToSend.asset;
+    // delete dataToSend.reviewer;
+    // delete dataToSend.reviewerId;
+    try {
+      const response = await reviewAPI.updateReviewById(id, dataToSend);
+      console.log(response.data);
+      setReview(response.data);
+    } catch (error) {
+      const message = error.error || "An error occurred";
+      toast.error(message);
+    }
   };
 
   {
@@ -49,19 +64,15 @@ function ReviewPopUp({ id, setId }) {
     }
   };
 
-  {
-    /* List the deficiencies */
-  }
-  const mapDeficiencies = () => {
-    return deficiencies.map((item, index) => {});
-  };
   useEffect(() => {
     const fetchReview = async () => {
       setReview(null); // Reset review while loading new one
       try {
         const res = await reviewAPI.getReviewById(id);
         setReview(res.data);
-        console.log(res.data);
+        setDefects(res.data.defects);
+        setAssemblies(res.data.assemblies);
+        setInstructions(res.data.instructions);
       } catch (error) {
         const message = error.error || "An error occurred";
         toast.error(message);
@@ -93,15 +104,7 @@ function ReviewPopUp({ id, setId }) {
         <button onClick={() => setId(0)} className="popup-close">
           <X size={22} strokeWidth={3} />
         </button>
-        <h2>
-          Review #
-          <DynamicUpdateField
-            onChange={(val) => updateField("reviewId", val)}
-            inputType={"text"}
-            value={id}
-            editing={editing}
-          />
-        </h2>
+        <h2>Review #{review.reviewId}</h2>
         <h3>Elevator #{review.assetId}</h3>
         <h3>
           <DynamicUpdateField
@@ -136,8 +139,12 @@ function ReviewPopUp({ id, setId }) {
             editing={editing}
           />
         </div>
-        <h3>Deficiencies</h3>
-        {/* <div>{review.deficiencies}</div> */}
+        <DefectsBlock
+          defects={defects}
+          setDefects={setDefects}
+          setChanged={() => setChanged(true)}
+          editing={editing}
+        />
         <h3>Previous reviews</h3>
         {/* Changes to another review */}
         {review.asset.reviews.map((item, index) => (
@@ -160,6 +167,7 @@ function ReviewPopUp({ id, setId }) {
           >
             {editing ? "Done" : "Edit"}
           </button>
+          {!editing && changed ? <button onClick={saveChanges}>Save Changes</button> : ""}
           <button onClick={createOrder}>Create Order</button>
         </div>
       </div>

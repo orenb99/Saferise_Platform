@@ -100,6 +100,14 @@ export const reviewAPI = {
       throw error.response?.data || { error: "Network error occurred" };
     }
   },
+  updateReviewById: async (id, data) => {
+    try {
+      const response = await api.put(`/reviews/${id}`, data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: "Network error occurred" };
+    }
+  },
 };
 
 export const orderAPI = {

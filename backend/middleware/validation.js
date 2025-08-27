@@ -102,7 +102,13 @@ const validateReviewId = [
     .withMessage("Invalid review ID"),
   checkValidation,
 ];
-// FILL LATER
+// FILL LATER WITH AI
+const validateReview = [
+  body("maxPassengers").isInt().withMessage("Max Passengers must be a number"),
+  checkValidation,
+];
+
+// FILL LATER WITH AI
 const validateOrder = [
   param("orderId")
     .matches(/^[a-zA-Z0-9]{0,18}$/)
@@ -116,4 +122,5 @@ module.exports = {
   validateSearchReviews,
   validateReviewId,
   validateOrder,
+  validateReview,
 };

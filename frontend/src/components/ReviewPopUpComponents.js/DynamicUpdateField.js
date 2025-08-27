@@ -12,7 +12,17 @@ function DynamicUpdateField({ editing, inputType, value, onChange }) {
         />
       );
     return (
-      <input type={inputType} defaultValue={value} onChange={(e) => onChange(e.target.value)} />
+      <input
+        type={inputType}
+        defaultValue={value}
+        onChange={(e) => {
+          let val = e.target.value;
+          if (inputType === "number") {
+            val = Number(val);
+          }
+          onChange(val);
+        }}
+      />
     );
   }
   return <span>{inputType === "date" ? new Date(value).toLocaleDateString("en-GB") : value}</span>;

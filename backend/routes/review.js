@@ -5,8 +5,8 @@ const {
   sanitizeInput,
   validateSearchReviews,
   validateReviewId,
+  validateReview,
 } = require("../middleware/validation");
-const { ReviewerDecision } = require("@prisma/client");
 
 const router = express.Router();
 router.get("/search", validateSearchReviews, verifyToken, async (req, res) => {
@@ -92,6 +92,9 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
     const review = await prisma.review.findUnique({
       where: { reviewId },
       include: {
+        defects: true,
+        instructions: true,
+        assemblies: true,
         reviewer: {
           select: {
             reviewerId: true,
@@ -116,6 +119,43 @@ router.get("/:reviewId", validateReviewId, verifyToken, async (req, res) => {
   } catch (error) {
     console.error("Get review error:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/:reviewId", validateReviewId, validateReview, verifyToken, async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { defects, assemblies, instructions, ...otherFields } = req.body;
+
+    const updatedReview = await prisma.review.update({
+      where: { reviewId },
+      data: {
+        ...otherFields,
+        defects: {
+          deleteMany: {}, // deletes all existing defects for this review
+          createMany: { data: defects || [] }, // Adding all the new ones
+        },
+        instructions: {
+          deleteMany: {},
+          createMany: { data: instructions || [] },
+        },
+        assemblies: {
+          deleteMany: {},
+          createMany: { data: assemblies || [] },
+        },
+      },
+      include: {
+        defects: true,
+        instructions: true,
+        assemblies: true,
+        asset: { include: { reviews: true } },
+      },
+    });
+
+    res.status(201).json({ message: "Update Succeeded", data: updatedReview });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
