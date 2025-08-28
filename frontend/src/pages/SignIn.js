@@ -1,23 +1,23 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { AlertCircle } from 'lucide-react';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { AlertCircle } from "lucide-react";
 
 const SignIn = () => {
   const navigate = useNavigate();
   const { signIn, loading } = useAuth();
-  
+
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
   const onSubmit = async (data) => {
     try {
       await signIn(data);
-      navigate('/main');
+      navigate("/main");
     } catch (error) {
       // Error handling is done in the context
     }
@@ -39,18 +39,18 @@ const SignIn = () => {
             <input
               id="fullName"
               type="text"
-              className={`form-input ${errors.fullName ? 'error' : ''}`}
+              className={`form-input ${errors.fullName ? "error" : ""}`}
               placeholder="Enter your full name"
-              {...register('fullName', {
-                required: 'Full name is required',
+              {...register("fullName", {
+                required: "Full name is required",
                 minLength: {
                   value: 2,
-                  message: 'Full name must be at least 2 characters'
+                  message: "Full name must be at least 2 characters",
                 },
                 maxLength: {
                   value: 100,
-                  message: 'Full name cannot exceed 100 characters'
-                }
+                  message: "Full name cannot exceed 100 characters",
+                },
               })}
             />
             {errors.fullName && (
@@ -62,27 +62,27 @@ const SignIn = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="israeliId" className="form-label">
+            <label htmlFor="inspectorId" className="form-label">
               Israeli ID
             </label>
             <input
-              id="israeliId"
+              id="inspectorId"
               type="text"
-              className={`form-input ${errors.israeliId ? 'error' : ''}`}
+              className={`form-input ${errors.id ? "error" : ""}`}
               placeholder="Enter your 9-digit Israeli ID"
               maxLength={9}
-              {...register('israeliId', {
-                required: 'Israeli ID is required',
+              {...register("inspectorId", {
+                required: "Israeli ID is required",
                 pattern: {
                   value: /^\d{9}$/,
-                  message: 'Israeli ID must be exactly 9 digits'
-                }
+                  message: "Israeli ID must be exactly 9 digits",
+                },
               })}
             />
-            {errors.israeliId && (
+            {errors.inspectorId && (
               <div className="error-message">
                 <AlertCircle size={16} />
-                {errors.israeliId.message}
+                {errors.inspectorId.message}
               </div>
             )}
           </div>
@@ -94,10 +94,10 @@ const SignIn = () => {
             <input
               id="password"
               type="password"
-              className={`form-input ${errors.password ? 'error' : ''}`}
+              className={`form-input ${errors.password ? "error" : ""}`}
               placeholder="Enter your password"
-              {...register('password', {
-                required: 'Password is required'
+              {...register("password", {
+                required: "Password is required",
               })}
             />
             {errors.password && (
@@ -108,18 +108,14 @@ const SignIn = () => {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="submit-button"
-            disabled={loading}
-          >
-            {loading ? 'Signing In...' : 'Sign In'}
+          <button type="submit" className="submit-button" disabled={loading}>
+            {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
         <div className="text-center">
           <p>
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link to="/signup" className="link-button">
               Create Account
             </Link>

@@ -1,135 +1,146 @@
-const express = require('express');
-const User = require('../models/User');
-const { generateToken, verifyToken } = require('../middleware/auth');
-const { sanitizeInput, validateSignup, validateSignin } = require('../middleware/validation');
+const express = require("express");
+const prisma = require("../prisma/prisma-client");
+const { generateToken, verifyToken } = require("../middleware/auth");
+const { sanitizeInput, validateSignup, validateSignin } = require("../middleware/validation");
+const { InspectorType } = require("@prisma/client");
 
 const router = express.Router();
 
 // Sign Up Route
-router.post('/signup', sanitizeInput, validateSignup, async (req, res) => {
+router.post("/signup", sanitizeInput, validateSignup, async (req, res) => {
   try {
-    const { fullName, email, israeliId, role, password } = req.body;
-    
+    const { fullName, email, inspectorId, password, phoneNumber, inspectorType, employeeId } =
+      req.body;
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email }, { israeliId }]
+    const existingUser = await prisma.inspector.findFirst({
+      where: { OR: [{ email }, { inspectorId }, { phoneNumber }, { employeeId }] },
     });
-    
+
     if (existingUser) {
-      const field = existingUser.email === email ? 'email' : 'Israeli ID';
+      const field =
+        existingUser.email === email
+          ? "email"
+          : existingUser.inspectorId === inspectorId
+          ? "ID"
+          : existingUser.phoneNumber === phoneNumber
+          ? "phone number"
+          : "employee ID";
       return res.status(400).json({
-        error: `User with this ${field} already exists`
+        error: `User with this ${field} already exists`,
       });
     }
-    
     // Create new user
-    const user = new User({
-      fullName,
-      email,
-      israeliId,
-      role,
-      password
+    const inspector = await prisma.inspector.create({
+      data: {
+        inspectorId,
+        fullName,
+        email,
+        password,
+        employeeId,
+        phoneNumber,
+        inspectorType: inspectorType ? InspectorType.Regional : InspectorType.Chief,
+      },
     });
-    
-    await user.save();
-    
+
     // Generate token
-    const token = generateToken(user._id);
-    
-    res.status(201).json({
-      message: 'User created successfully',
+    const token = generateToken(inspector.inspectorId);
+
+    return res.status(201).json({
+      message: "User created successfully",
       token,
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        israeliId: user.israeliId,
-        role: user.role
-      }
+      inspector: {
+        fullName: inspector.fullName,
+        email: inspector.email,
+        inspectorId: inspector.inspectorId,
+        employeeId: inspector.employeeId,
+        phoneNumber: inspector.phoneNumber,
+        inspectorType: inspector.inspectorType,
+      },
     });
-    
   } catch (error) {
-    console.error('Signup error:', error);
-    
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
+    console.error("Signup error:", error.message);
+
+    // CHECK!!!
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ error: error.message, details: error.details });
+    }
+    if (error.code === "P2002") {
       return res.status(400).json({
-        error: 'Validation failed',
-        details: errors
+        error: "Duplicate field",
+        details: [error.meta.target.join(", ")],
       });
     }
-    
+
     res.status(500).json({
-      error: 'Server error during registration'
+      error: "Server error during registration",
     });
   }
 });
 
 // Sign In Route
-router.post('/signin', sanitizeInput, validateSignin, async (req, res) => {
+router.post("/signin", sanitizeInput, validateSignin, async (req, res) => {
   try {
-    const { fullName, israeliId, password } = req.body;
-    
+    const { fullName, inspectorId, password } = req.body;
+
     // Find user by name and Israeli ID
-    const user = await User.findOne({
-      fullName: { $regex: new RegExp(`^${fullName}$`, 'i') },
-      israeliId
+    const inspector = await prisma.inspector.findFirst({
+      where: { AND: [{ fullName: { equals: fullName, mode: "insensitive" } }, { inspectorId }] },
     });
-    
-    if (!user) {
+
+    if (!inspector) {
       return res.status(401).json({
-        error: 'Invalid credentials. Please check your name, ID, and password.'
+        error: "Invalid credentials. Please check your name, ID, and password.",
       });
     }
-    
     // Check password
-    const isPasswordValid = await user.comparePassword(password);
-    
+    const isPasswordValid = await prisma.inspector.comparePassword(password, inspector.password);
+
     if (!isPasswordValid) {
       return res.status(401).json({
-        error: 'Invalid credentials. Please check your name, ID, and password.'
+        error: "Invalid credentials. Please check your name, ID, and password.",
       });
     }
-    
+
     // Generate token
-    const token = generateToken(user._id);
-    
+    const token = generateToken(inspector.inspectorId);
+
     res.json({
-      message: 'Sign in successful',
+      message: "Sign in successful",
       token,
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        israeliId: user.israeliId,
-        role: user.role
-      }
+      inspector: {
+        fullName: inspector.fullName,
+        email: inspector.email,
+        inspectorId: inspector.inspectorId,
+        phoneNumber: inspector.phoneNumber,
+        employeeId: inspector.employeeId,
+        inspectorType: inspector.inspectorType,
+      },
     });
-    
   } catch (error) {
-    console.error('Signin error:', error);
+    console.error("Signin error:", error);
     res.status(500).json({
-      error: 'Server error during sign in'
+      error: "Server error during sign in",
     });
   }
 });
 
 // Get Current User Route (for protecting routes)
-router.get('/me', verifyToken, async (req, res) => {
+router.get("/me", verifyToken, async (req, res) => {
   try {
     res.json({
-      user: {
-        id: req.user._id,
-        fullName: req.user.fullName,
-        email: req.user.email,
-        israeliId: req.user.israeliId,
-        role: req.user.role
-      }
+      inspector: {
+        fullName: req.inspector.fullName,
+        email: req.inspector.email,
+        inspectorId: req.inspector.inspectorId,
+        phoneNumber: req.inspector.phoneNumber,
+        employeeId: req.inspector.employeeId,
+        inspectorType: req.inspector.inspectorType,
+      },
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error("Get user error:", error);
     res.status(500).json({
-      error: 'Server error retrieving user information'
+      error: "Server error retrieving user information",
     });
   }
 });

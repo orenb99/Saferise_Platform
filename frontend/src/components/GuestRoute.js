@@ -1,9 +1,8 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Header from "./Header";
 
-const ProtectedRoute = ({ children }) => {
+const GuestRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
@@ -14,14 +13,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated ? (
-    <>
-      <Header />
-      {children}
-    </>
-  ) : (
-    <Navigate to="/signin" replace />
-  );
+  return isAuthenticated ? <Navigate to="/main" replace /> : children;
 };
 
-export default ProtectedRoute;
+export default GuestRoute;

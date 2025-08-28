@@ -1,12 +1,14 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import SignUp from './pages/SignUp';
-import SignIn from './pages/SignIn';
-import MainPage from './pages/MainPage';
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
+import MainPage from "./pages/MainPage";
+import AlertsPage from "./pages/AlertsPage";
+import GuestRoute from "./components/GuestRoute";
+import ReviewPage from "./pages/ReviewPage";
 function App() {
   return (
     <AuthProvider>
@@ -17,30 +19,44 @@ function App() {
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
+                background: "#363636",
+                color: "#fff",
               },
               success: {
                 style: {
-                  background: '#10b981',
+                  background: "#10b981",
                 },
               },
               error: {
                 style: {
-                  background: '#ef4444',
+                  background: "#ef4444",
                 },
               },
             }}
           />
-          
+
           <Routes>
             {/* Redirect root to signup */}
             <Route path="/" element={<Navigate to="/signup" replace />} />
-            
-            {/* Public routes */}
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/signin" element={<SignIn />} />
-            
+
+            {/* Guest routes */}
+            <Route
+              path="/signup"
+              element={
+                <GuestRoute>
+                  <SignUp />
+                </GuestRoute>
+              }
+            />
+            <Route
+              path="/signin"
+              element={
+                <GuestRoute>
+                  <SignIn />
+                </GuestRoute>
+              }
+            />
+
             {/* Protected routes */}
             <Route
               path="/main"
@@ -50,7 +66,22 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+            <Route
+              path="/alerts"
+              element={
+                <ProtectedRoute>
+                  <AlertsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reviews"
+              element={
+                <ProtectedRoute>
+                  <ReviewPage />
+                </ProtectedRoute>
+              }
+            />
             {/* Catch all route */}
             <Route path="*" element={<Navigate to="/signup" replace />} />
           </Routes>
