@@ -268,7 +268,7 @@ CREATE TABLE "Review" (
     "severityLevel" "ReviewSeverityLevel" NOT NULL DEFAULT 'OK',
     "requiresOrder" BOOLEAN NOT NULL DEFAULT false,
     "processingError" TEXT,
-    "originalDocumentPath" VARCHAR(500),
+    "originalDocumentPath" VARCHAR(500) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -351,8 +351,6 @@ CREATE TABLE "Alert" (
     "description" TEXT NOT NULL,
     "dueDate" TIMESTAMP(3),
     "status" "AlertStatus" NOT NULL DEFAULT 'Open',
-    "isRead" BOOLEAN NOT NULL DEFAULT false,
-    "readDate" TIMESTAMP(3),
     "resolvedDate" TIMESTAMP(3),
     "resolvedBy" VARCHAR(18),
     "resolutionNotes" TEXT,
@@ -407,7 +405,8 @@ CREATE TABLE "AssetSummary" (
     "criticalDefects" INTEGER NOT NULL DEFAULT 0,
     "minorDefects" INTEGER NOT NULL DEFAULT 0,
     "ordersIssued" INTEGER NOT NULL DEFAULT 0,
-    "lastUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "AssetSummary_pkey" PRIMARY KEY ("summaryId")
 );
@@ -416,7 +415,6 @@ CREATE TABLE "AssetSummary" (
 CREATE TABLE "DashboardMetrics" (
     "metricId" VARCHAR(18) NOT NULL,
     "regionId" VARCHAR(18),
-    "metricDate" DATE NOT NULL,
     "newReviewsToday" INTEGER NOT NULL DEFAULT 0,
     "activeElevators" INTEGER NOT NULL DEFAULT 0,
     "disabledElevators" INTEGER NOT NULL DEFAULT 0,
@@ -424,7 +422,8 @@ CREATE TABLE "DashboardMetrics" (
     "expiredInspections" INTEGER NOT NULL DEFAULT 0,
     "criticalAlerts" INTEGER NOT NULL DEFAULT 0,
     "pendingOrders" INTEGER NOT NULL DEFAULT 0,
-    "lastUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "DashboardMetrics_pkey" PRIMARY KEY ("metricId")
 );
@@ -482,9 +481,6 @@ CREATE UNIQUE INDEX "SafetyOrder_orderNumber_key" ON "SafetyOrder"("orderNumber"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AssetSummary_assetId_summaryDate_key" ON "AssetSummary"("assetId", "summaryDate");
-
--- CreateIndex
-CREATE UNIQUE INDEX "DashboardMetrics_regionId_metricDate_key" ON "DashboardMetrics"("regionId", "metricDate");
 
 -- AddForeignKey
 ALTER TABLE "Inspector" ADD CONSTRAINT "Inspector_regionId_fkey" FOREIGN KEY ("regionId") REFERENCES "Region"("regionId") ON DELETE SET NULL ON UPDATE CASCADE;
